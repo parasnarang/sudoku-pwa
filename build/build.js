@@ -428,11 +428,29 @@ class BuildOptimizer {
     // Utility methods for minification and optimization
     
     minifyHTML(html) {
-        return html
+        // First extract and preserve script content to avoid breaking JavaScript comments
+        const scriptBlocks = [];
+        let htmlWithPlaceholders = html.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, (match, scriptContent) => {
+            scriptBlocks.push(match);
+            return `<!--SCRIPT_PLACEHOLDER_${scriptBlocks.length - 1}-->`;
+        });
+        
+        // Minify HTML (but not script content)
+        htmlWithPlaceholders = htmlWithPlaceholders
             .replace(/\s+/g, ' ')
             .replace(/<!--[\s\S]*?-->/g, '')
             .replace(/>\s+</g, '><')
             .trim();
+            
+        // Restore script blocks without minification
+        scriptBlocks.forEach((scriptBlock, index) => {
+            htmlWithPlaceholders = htmlWithPlaceholders.replace(
+                `<!--SCRIPT_PLACEHOLDER_${index}-->`, 
+                scriptBlock
+            );
+        });
+        
+        return htmlWithPlaceholders;
     }
 
     minifyCSS(css) {
