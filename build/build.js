@@ -356,7 +356,7 @@ class BuildOptimizer {
             
             let optimizedSW = swContent
                 .replace(/const CACHE_VERSION = '[^']*'/, `const CACHE_VERSION = '${cacheVersion}'`)
-                .replace(/const urlsToCache = \[[^\]]*\]/, `const urlsToCache = ${JSON.stringify(filesToCache, null, 2)}`);
+                .replace(/const STATIC_ASSETS = \[[^\]]*?\];/s, `const STATIC_ASSETS = ${JSON.stringify(filesToCache, null, 4)};`);
             
             // Add production optimizations
             optimizedSW = this.addSWOptimizations(optimizedSW);
