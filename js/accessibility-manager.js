@@ -191,6 +191,39 @@ class AccessibilityManager {
         });
     }
 
+    enhanceFormAccessibility() {
+        // Enhanced form accessibility - set up form labels, error messages, etc.
+        const forms = document.querySelectorAll('form, .form-section');
+        forms.forEach(form => {
+            // Ensure all inputs have proper labels
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (!input.getAttribute('aria-label') && !input.getAttribute('aria-labelledby')) {
+                    const label = form.querySelector(`label[for="${input.id}"]`);
+                    if (label) {
+                        input.setAttribute('aria-labelledby', label.id || `label-${input.id}`);
+                    }
+                }
+            });
+        });
+    }
+
+    setupLiveRegions() {
+        // Create live regions for dynamic content announcements
+        if (!document.getElementById('accessibility-announcer')) {
+            const announcer = document.createElement('div');
+            announcer.id = 'accessibility-announcer';
+            announcer.setAttribute('aria-live', 'polite');
+            announcer.setAttribute('aria-atomic', 'true');
+            announcer.style.position = 'absolute';
+            announcer.style.left = '-10000px';
+            announcer.style.width = '1px';
+            announcer.style.height = '1px';
+            announcer.style.overflow = 'hidden';
+            document.body.appendChild(announcer);
+        }
+    }
+
     setupKeyboardNavigation() {
         // Grid navigation
         this.setupGridKeyboardNavigation();
