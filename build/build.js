@@ -556,6 +556,9 @@ class BuildOptimizer {
         // Get base URL for GitHub Pages or other deployments
         const baseUrl = process.env.PUBLIC_URL || '';
         
+        // For GitHub Pages, use relative paths instead of absolute paths
+        const isGitHubPages = baseUrl.includes('github.io');
+        
         // Update script and style references for bundled files
         if (this.config.bundleJS) {
             // Replace individual script tags with bundle references
@@ -573,11 +576,12 @@ class BuildOptimizer {
                 console.warn('⚠️  Could not find JS bundles, using default names');
             }
             
-            // Add bundle script tags with actual filenames
+            // Add bundle script tags - use relative paths for GitHub Pages
+            const scriptPrefix = isGitHubPages ? './js/' : (baseUrl ? `${baseUrl}/js/` : 'js/');
             const bundleScripts = `
-    <script src="${baseUrl}/js/${appBundle}"></script>
-    <script src="${baseUrl}/js/${uiBundle}"></script>
-    <script src="${baseUrl}/js/${pwaBundle}"></script>`;
+    <script src="${scriptPrefix}${appBundle}"></script>
+    <script src="${scriptPrefix}${uiBundle}"></script>
+    <script src="${scriptPrefix}${pwaBundle}"></script>`;
             
             html = html.replace('</body>', `${bundleScripts}\n</body>`);
         }
@@ -590,13 +594,20 @@ class BuildOptimizer {
         } catch (error) {
             console.warn('⚠️  Could not find CSS files, using default names');
         }
-        html = html.replace(/href="css\/styles\.css"/g, `href="${baseUrl}/css/${mainCss}"`);
         
-        // Update icon paths (build creates icons/ not images/icons/)
+        // Use relative paths for GitHub Pages
+        const cssPrefix = isGitHubPages ? 'css/' : (baseUrl ? `${baseUrl}/css/` : 'css/');
+        html = html.replace(/href="css\/styles\.css"/g, `href="${cssPrefix}${mainCss}"`);
+        
+        // Update icon paths (build creates icons/ not images/icons/) - use relative paths
         html = html.replace(/images\/icons\//g, 'icons/');
         
-        // Update other asset references with base URL
-        if (baseUrl) {
+        // Update other asset references - use relative paths for GitHub Pages
+        if (isGitHubPages) {
+            // For GitHub Pages, convert absolute paths to relative paths
+            html = html.replace(/src="\/(?!\/)/g, 'src="./');
+            html = html.replace(/href="\/(?!\/|#)/g, 'href="./');
+        } else if (baseUrl) {
             html = html.replace(/src="(?!http|\/\/|data:)([^"]*)/g, `src="${baseUrl}/$1`);
             html = html.replace(/href="(?!http|\/\/|#|.*\/)([^"]*)/g, `href="${baseUrl}/$1`);
         }
@@ -683,6 +694,10 @@ class BuildOptimizer {
         // Get list of all build files for service worker caching
         const files = [];
         
+        // Get base URL for GitHub Pages or other deployments
+        const baseUrl = process.env.PUBLIC_URL || '';
+        const isGitHubPages = baseUrl.includes('github.io');
+        
         // Add core files
         files.push('/');
         files.push('/manifest.json');
@@ -698,6 +713,12 @@ class BuildOptimizer {
         // Add icons
         const iconFiles = await this.findFiles(path.join(this.buildDir, 'icons'), '.png');
         files.push(...iconFiles.map(f => '/icons/' + path.basename(f)));
+        
+        // For GitHub Pages, also add relative paths to ensure proper caching
+        if (isGitHubPages) {
+            const relativeFiles = [...files];
+            files.push(...relativeFiles.map(f => f === '/' ? './' : f.replace(/^\//, './')));
+        }
         
         return files;
     }

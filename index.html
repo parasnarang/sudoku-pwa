@@ -781,8 +781,25 @@
     <script src="js/app-router.js"></script>
     <script src="js/game-ui.js"></script>
     <script>
+        console.log('🌟 INLINE SCRIPT STARTED - Basic JavaScript is working');
+        console.log('📍 Current location:', window.location.href);
+        console.log('🏠 Base URL:', window.location.origin);
+        
+        // Check if scripts are loading
+        window.addEventListener('error', (e) => {
+            console.error('❌ RESOURCE LOADING ERROR:', e.filename, e.message);
+            if (e.filename && e.filename.includes('.js')) {
+                console.error('🚨 JavaScript file failed to load:', e.filename);
+            }
+        });
+        
+        // Track when scripts load
+        const scripts = document.getElementsByTagName('script');
+        console.log('📜 Total scripts found:', scripts.length);
+        
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
+                console.log('🚀 Window load event fired');
                 navigator.serviceWorker.register('sw.js')
                     .then(registration => {
                         console.log('SW registered: ', registration);
