@@ -512,12 +512,17 @@ class BuildOptimizer {
         // Replace development code with production versions
         let processed = js;
         
-        // Replace console.log calls in production
-        processed = processed.replace(/console\.(log|debug|info)\([^)]*\);?/g, '');
-        
-        // Replace development flags
+        // Replace NODE_ENV checks first
+        processed = processed.replace(/process\.env\.NODE_ENV !== 'production'/g, 'false');
         processed = processed.replace(/process\.env\.NODE_ENV === 'development'/g, 'false');
         processed = processed.replace(/process\.env\.NODE_ENV === 'production'/g, 'true');
+        
+        // Replace console.log calls in production (including logger.log)
+        processed = processed.replace(/console\.(log|debug|info)\([^)]*\);?\s*/g, '');
+        processed = processed.replace(/logger\.log\([^)]*\);?\s*/g, '');
+        
+        // Remove empty if blocks after NODE_ENV replacement
+        processed = processed.replace(/if\s*\(\s*false\s*\)\s*\{[^{}]*\}/g, '');
         
         return processed;
     }

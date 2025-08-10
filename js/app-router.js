@@ -281,7 +281,7 @@ class AppRouter {
         // Update homepage statistics
         if (window.userProgress) {
             const stats = window.userProgress.getDisplayStats();
-            const completionStats = window.userProgress.getCompletionStats();
+            // const completionStats = window.userProgress.getCompletionStats(); // unused
 
             // Update UI elements
             document.getElementById('best-score').textContent = stats.bestScore;

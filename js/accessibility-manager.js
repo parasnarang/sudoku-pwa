@@ -377,7 +377,7 @@ class AccessibilityManager {
         });
 
         // Handle focus restoration
-        document.addEventListener('focusout', e => {
+        document.addEventListener('focusout', _e => {
             // Restore focus if it leaves the document
             setTimeout(() => {
                 if (!document.activeElement || document.activeElement === document.body) {

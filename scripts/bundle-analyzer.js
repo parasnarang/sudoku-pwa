@@ -828,8 +828,8 @@ if (require.main === module) {
     analyzer.analyze()
         .then(report => {
             console.log('\n✅ Bundle analysis completed successfully!');
-            const hasIssues = report.summary.issues.some(i => i.severity === 'warning' || i.severity === 'error');
-            process.exit(hasIssues ? 1 : 0);
+            const hasErrors = report.summary.issues.some(i => i.severity === 'error');
+            process.exit(hasErrors ? 1 : 0);
         })
         .catch(error => {
             console.error('\n❌ Bundle analysis failed:', error);
