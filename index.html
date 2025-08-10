@@ -854,9 +854,10 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 DOM Content Loaded - Starting app initialization...');
             
-            setTimeout(async () => {
+            // Initialize immediately after DOM and scripts are ready
+            const initializeApp = async () => {
                 try {
-                    console.log('⏱️ Timeout started - Checking available classes...');
+                    console.log('⏱️ App initialization starting - Checking available classes...');
                     
                     // Log available classes
                     console.log('Available classes check:');
@@ -1032,8 +1033,13 @@
                         console.log('🚨 Emergency fallback: Loading screen hidden despite initialization error');
                     }
                 }
-                
-            }, 2000);
+            };
+            
+            // Wait a short moment for all scripts to finish executing, then initialize
+            setTimeout(() => {
+                console.log('🔄 Starting app initialization after script load...');
+                initializeApp();
+            }, 100);
 
             // Set current date
             const today = new Date();
