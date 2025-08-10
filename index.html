@@ -785,6 +785,18 @@
         console.log('📍 Current location:', window.location.href);
         console.log('🏠 Base URL:', window.location.origin);
         
+        // EMERGENCY FIX: Hide loading screen immediately and show app
+        console.log('🚨 EMERGENCY FIX: Hiding loading screen immediately');
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            const app = document.getElementById('app');
+            if (loadingScreen && app) {
+                loadingScreen.style.display = 'none';
+                app.classList.remove('hidden');
+                console.log('✅ EMERGENCY FIX: Loading screen hidden, app shown');
+            }
+        }, 1000);
+        
         // Check if scripts are loading
         window.addEventListener('error', (e) => {
             console.error('❌ GLOBAL ERROR:', e.filename, e.message, e.error);
