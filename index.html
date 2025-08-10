@@ -822,30 +822,50 @@
                 }
                 
                 // Initialize performance monitoring first
-                performanceMonitor = new PerformanceMonitor();
-                performanceMonitor.mark('app-init-start');
+                if (typeof PerformanceMonitor !== 'undefined') {
+                    performanceMonitor = new PerformanceMonitor();
+                    performanceMonitor.mark('app-init-start');
+                }
                 
                 // Initialize animation system
-                animationManager = new AnimationManager();
+                if (typeof AnimationManager !== 'undefined') {
+                    animationManager = new AnimationManager();
+                }
                 
                 // Initialize accessibility manager
-                accessibilityManager = new AccessibilityManager();
+                if (typeof AccessibilityManager !== 'undefined') {
+                    accessibilityManager = new AccessibilityManager();
+                }
                 
                 // Initialize PWA manager
-                pwaManager = new PWAManager();
+                if (typeof PWAManager !== 'undefined') {
+                    pwaManager = new PWAManager();
+                }
                 
                 // Initialize data storage system
-                dataStorage = new DataStorage();
-                await dataStorage.initializeStorage();
+                if (typeof DataStorage !== 'undefined') {
+                    dataStorage = new DataStorage();
+                    await dataStorage.initializeStorage();
+                    
+                    // Initialize settings manager
+                    if (typeof SettingsManager !== 'undefined') {
+                        settingsManager = new SettingsManager(dataStorage);
+                        await settingsManager.loadSettings();
+                    }
+                    
+                    // Initialize core systems
+                    if (typeof UserProgress !== 'undefined') {
+                        userProgress = new UserProgress(dataStorage);
+                    }
+                }
                 
-                // Initialize settings manager
-                settingsManager = new SettingsManager(dataStorage);
-                await settingsManager.loadSettings();
+                if (typeof AppRouter !== 'undefined') {
+                    appRouter = new AppRouter();
+                }
                 
-                // Initialize core systems
-                userProgress = new UserProgress(dataStorage);
-                appRouter = new AppRouter();
-                gameUI = new GameUI();
+                if (typeof GameUI !== 'undefined') {
+                    gameUI = new GameUI();
+                }
                 
                 // Make them globally available
                 window.performanceMonitor = performanceMonitor;
@@ -859,35 +879,59 @@
                 window.gameUI = gameUI;
                 
                 // Connect managers to game UI
-                accessibilityManager.setGameReference(gameUI);
+                if (accessibilityManager && gameUI) {
+                    accessibilityManager.setGameReference(gameUI);
+                }
                 
                 // Initialize homepage with user data
-                updateHomePage();
+                if (typeof updateHomePage === 'function') {
+                    updateHomePage();
+                }
                 
                 // Try to load saved game from storage system
-                const savedGame = await dataStorage.loadGameState();
-                if (savedGame.success && gameUI.engine) {
-                    const result = gameUI.engine.importGameState(savedGame.gameData);
-                    if (result.success) {
-                        gameUI.updateUI();
-                        gameUI.renderGrid();
-                        gameUI.startTimer();
-                        appRouter.navigateTo('/game');
+                if (dataStorage && gameUI) {
+                    try {
+                        const savedGame = await dataStorage.loadGameState();
+                        if (savedGame.success && gameUI.engine) {
+                            const result = gameUI.engine.importGameState(savedGame.gameData);
+                            if (result.success) {
+                                gameUI.updateUI();
+                                gameUI.renderGrid();
+                                gameUI.startTimer();
+                                if (appRouter) {
+                                    appRouter.navigateTo('/game');
+                                }
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Failed to load saved game:', error);
                     }
                 }
                 
                 // Start auto-save system
-                dataStorage.startAutoSave(gameUI);
+                if (dataStorage && gameUI) {
+                    try {
+                        dataStorage.startAutoSave(gameUI);
+                    } catch (error) {
+                        console.warn('Failed to start auto-save:', error);
+                    }
+                }
                 
                 // Setup achievement notifications
-                setupAchievementSystem();
+                if (typeof setupAchievementSystem === 'function') {
+                    setupAchievementSystem();
+                }
                 
                 // Setup connection monitoring
-                setupConnectionMonitoring();
+                if (typeof setupConnectionMonitoring === 'function') {
+                    setupConnectionMonitoring();
+                }
                 
                 // Mark app initialization complete
-                performanceMonitor.mark('app-init-complete');
-                performanceMonitor.measure('app-init-duration', 'app-init-start', 'app-init-complete');
+                if (performanceMonitor) {
+                    performanceMonitor.mark('app-init-complete');
+                    performanceMonitor.measure('app-init-duration', 'app-init-start', 'app-init-complete');
+                }
                 
             }, 2000);
 

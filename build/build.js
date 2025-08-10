@@ -222,9 +222,9 @@ class BuildOptimizer {
                         const content = await fs.readFile(filePath, 'utf8');
                         originalSize += content.length;
                         
-                        // Wrap in IIFE to prevent global scope pollution
+                        // Add file separator and content directly (classes need global scope)
                         bundledContent += `\n/* === ${file} === */\n`;
-                        bundledContent += `(function() {\n${content}\n})();\n`;
+                        bundledContent += `${content}\n`;
                         
                     } catch (fileError) {
                         console.warn(`⚠️  Warning: Could not include ${file} in bundle`);
