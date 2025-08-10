@@ -43,11 +43,11 @@ class BuildOptimizer {
             // Clean build directory
             await this.cleanBuildDir();
             
-            // Process files
-            await this.processHTML();
+            // Process files (HTML last so it can reference actual generated filenames)
             await this.processCSS();
             await this.processJavaScript();
             await this.processAssets();
+            await this.processHTML();
             await this.generateServiceWorker();
             await this.generateManifest();
             await this.createDeploymentFiles();
@@ -489,11 +489,10 @@ class BuildOptimizer {
         // Add production meta tags
         let optimized = html;
         
-        // Add security headers
+        // Add security headers (remove X-Frame-Options meta as it should be HTTP header only)
         const securityHeaders = `
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:;">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">`;
         
         optimized = optimized.replace('</head>', `${securityHeaders}\n</head>`);
@@ -564,22 +563,46 @@ class BuildOptimizer {
         // Update script and style references for bundled files
         if (this.config.bundleJS) {
             // Replace individual script tags with bundle references
-            const scriptPattern = /<script src="js\/[^"]*"><\/script>/g;
+            const scriptPattern = /<script src="[^"]*js\/[^"]*"><\/script>/g;
             html = html.replace(scriptPattern, '');
             
-            // Add bundle script tags with base URL
+            // Get actual generated bundle filenames
+            let appBundle = 'app.js', uiBundle = 'ui.js', pwaBundle = 'pwa.js';
+            try {
+                const jsFiles = require('fs').readdirSync(require('path').join(this.buildDir, 'js'));
+                appBundle = jsFiles.find(f => f.startsWith('app.')) || 'app.js';
+                uiBundle = jsFiles.find(f => f.startsWith('ui.')) || 'ui.js';
+                pwaBundle = jsFiles.find(f => f.startsWith('pwa.')) || 'pwa.js';
+            } catch (error) {
+                console.warn('⚠️  Could not find JS bundles, using default names');
+            }
+            
+            // Add bundle script tags with actual filenames
             const bundleScripts = `
-    <script src="${baseUrl}/js/app.js"></script>
-    <script src="${baseUrl}/js/ui.js"></script>
-    <script src="${baseUrl}/js/pwa.js"></script>`;
+    <script src="${baseUrl}/js/${appBundle}"></script>
+    <script src="${baseUrl}/js/${uiBundle}"></script>
+    <script src="${baseUrl}/js/${pwaBundle}"></script>`;
             
             html = html.replace('</body>', `${bundleScripts}\n</body>`);
         }
         
+        // Update CSS references with actual generated filenames
+        let mainCss = 'styles.css';
+        try {
+            const cssFiles = require('fs').readdirSync(require('path').join(this.buildDir, 'css'));
+            mainCss = cssFiles.find(f => f.startsWith('styles.')) || 'styles.css';
+        } catch (error) {
+            console.warn('⚠️  Could not find CSS files, using default names');
+        }
+        html = html.replace(/href="css\/styles\.css"/g, `href="${baseUrl}/css/${mainCss}"`);
+        
+        // Update icon paths (build creates icons/ not images/icons/)
+        html = html.replace(/images\/icons\//g, 'icons/');
+        
         // Update other asset references with base URL
         if (baseUrl) {
             html = html.replace(/src="(?!http|\/\/|data:)([^"]*)/g, `src="${baseUrl}/$1`);
-            html = html.replace(/href="(?!http|\/\/|#)([^"]*)/g, `href="${baseUrl}/$1`);
+            html = html.replace(/href="(?!http|\/\/|#|.*\/)([^"]*)/g, `href="${baseUrl}/$1`);
         }
         
         return html;
