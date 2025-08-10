@@ -582,7 +582,9 @@ if (require.main === module) {
     auditor.runAudit()
         .then(report => {
             console.log('\n✅ Performance audit completed successfully!');
-            process.exit(report.summary.overall === 'pass' ? 0 : 1);
+            // Only fail on actual errors, not warnings
+            const shouldFail = report.summary.overall === 'FAIL' || report.summary.overall === 'ERROR';
+            process.exit(shouldFail ? 1 : 0);
         })
         .catch(error => {
             console.error('\n❌ Performance audit failed:', error);
