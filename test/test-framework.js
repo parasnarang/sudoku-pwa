@@ -560,3 +560,17 @@ if (typeof window !== 'undefined') {
     window.beforeAll = beforeAll;
     window.afterAll = afterAll;
 }
+
+// Node.js export
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = TestFramework;
+    module.exports.TestUtils = TestUtils;
+    module.exports.testFramework = testFramework;
+    module.exports.describe = describe;
+    module.exports.it = it;
+    module.exports.expect = expect;
+    module.exports.beforeEach = beforeEach;
+    module.exports.afterEach = afterEach;
+    module.exports.beforeAll = beforeAll;
+    module.exports.afterAll = afterAll;
+}

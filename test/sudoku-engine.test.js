@@ -240,7 +240,7 @@ describe('Sudoku Engine', () => {
             expect(engine.timer.isRunning).toBe(true);
         });
 
-        it('should stop timer', () => {
+        it('should stop timer', async () => {
             engine.startTimer();
             await TestUtils.wait(50);
             const elapsedTime = engine.stopTimer();
