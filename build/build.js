@@ -698,26 +698,38 @@ class BuildOptimizer {
         const baseUrl = process.env.PUBLIC_URL || '';
         const isGitHubPages = baseUrl.includes('github.io');
         
-        // Add core files
-        files.push('/');
-        files.push('/manifest.json');
-        
-        // Add JS bundles
-        const jsFiles = await this.findFiles(path.join(this.buildDir, 'js'), '.js');
-        files.push(...jsFiles.map(f => '/js/' + path.basename(f)));
-        
-        // Add CSS files
-        const cssFiles = await this.findFiles(path.join(this.buildDir, 'css'), '.css');
-        files.push(...cssFiles.map(f => '/css/' + path.basename(f)));
-        
-        // Add icons
-        const iconFiles = await this.findFiles(path.join(this.buildDir, 'icons'), '.png');
-        files.push(...iconFiles.map(f => '/icons/' + path.basename(f)));
-        
-        // For GitHub Pages, also add relative paths to ensure proper caching
         if (isGitHubPages) {
-            const relativeFiles = [...files];
-            files.push(...relativeFiles.map(f => f === '/' ? './' : f.replace(/^\//, './')));
+            // For GitHub Pages, use only relative paths
+            files.push('./');
+            files.push('manifest.json');
+            
+            // Add JS bundles with relative paths
+            const jsFiles = await this.findFiles(path.join(this.buildDir, 'js'), '.js');
+            files.push(...jsFiles.map(f => 'js/' + path.basename(f)));
+            
+            // Add CSS files with relative paths
+            const cssFiles = await this.findFiles(path.join(this.buildDir, 'css'), '.css');
+            files.push(...cssFiles.map(f => 'css/' + path.basename(f)));
+            
+            // Add icons with relative paths
+            const iconFiles = await this.findFiles(path.join(this.buildDir, 'icons'), '.png');
+            files.push(...iconFiles.map(f => 'icons/' + path.basename(f)));
+        } else {
+            // For other deployments, use absolute paths
+            files.push('/');
+            files.push('/manifest.json');
+            
+            // Add JS bundles
+            const jsFiles = await this.findFiles(path.join(this.buildDir, 'js'), '.js');
+            files.push(...jsFiles.map(f => '/js/' + path.basename(f)));
+            
+            // Add CSS files
+            const cssFiles = await this.findFiles(path.join(this.buildDir, 'css'), '.css');
+            files.push(...cssFiles.map(f => '/css/' + path.basename(f)));
+            
+            // Add icons
+            const iconFiles = await this.findFiles(path.join(this.buildDir, 'icons'), '.png');
+            files.push(...iconFiles.map(f => '/icons/' + path.basename(f)));
         }
         
         return files;
