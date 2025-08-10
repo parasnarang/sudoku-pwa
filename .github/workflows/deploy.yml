@@ -8,7 +8,6 @@ on:
 
 env:
   NODE_VERSION: '18'
-  CACHE_KEY: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
 jobs:
   lint-and-test:
@@ -22,10 +21,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm install
 
     - name: Run linter
       run: npm run lint
@@ -52,10 +50,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm install
 
     - name: Build application
       run: npm run build
@@ -88,10 +85,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm install
 
     - name: Download build artifacts
       uses: actions/download-artifact@v4
@@ -125,10 +121,9 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
 
     - name: Install dependencies
-      run: npm ci
+      run: npm install
 
     - name: Run security audit
       run: npm audit --audit-level high
