@@ -444,15 +444,11 @@ class BuildOptimizer {
     }
 
     minifyJS(js) {
-        // Simple JS minification (for production use a proper minifier like Terser)
+        // Disable aggressive minification to prevent syntax errors
+        // Only remove leading/trailing whitespace and normalize line endings
         return js
-            .replace(/\/\*[\s\S]*?\*\//g, '')
-            .replace(/\/\/.*$/gm, '')
-            .replace(/\s+/g, ' ')
-            .replace(/;\s*}/g, ';}')
-            .replace(/{\s*/g, '{')
-            .replace(/}\s*/g, '}')
-            .replace(/,\s*/g, ',')
+            .replace(/\r\n/g, '\n')
+            .replace(/\r/g, '\n')
             .trim();
     }
 

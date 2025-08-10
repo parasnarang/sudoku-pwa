@@ -18,8 +18,8 @@ const STATIC_ASSETS = [
     '/js/tournament-ui.js',
     '/js/app-router.js',
     '/js/game-ui.js',
-    '/images/icons/icon-192x192.png',
-    '/images/icons/icon-512x512.png'
+    '/icons/icon-192x192.png',
+    '/icons/icon-512x512.png'
 ];
 
 const CACHE_STRATEGIES = {
@@ -502,8 +502,8 @@ self.addEventListener('push', event => {
     
     const options = {
         body: 'Time for your daily Sudoku challenge!',
-        icon: '/images/icons/icon-192x192.png',
-        badge: '/images/icons/icon-72x72.png',
+        icon: '/icons/icon-192x192.png',
+        badge: '/icons/icon-72x72.png',
         vibrate: [100, 50, 100],
         data: {
             dateOfArrival: Date.now(),
@@ -514,12 +514,12 @@ self.addEventListener('push', event => {
             {
                 action: 'play-now',
                 title: 'Play Now',
-                icon: '/images/icons/play-icon.png'
+                icon: '/icons/play-icon.png'
             },
             {
                 action: 'dismiss',
                 title: 'Later',
-                icon: '/images/icons/dismiss-icon.png'
+                icon: '/icons/dismiss-icon.png'
             }
         ],
         requireInteraction: true
