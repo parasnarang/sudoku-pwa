@@ -2,32 +2,32 @@ class TournamentUI {
     constructor() {
         this.currentTournamentId = this.generateWeeklyTournamentId();
         this.selectedLevel = null;
-        
+
         this.levelData = [
-            { name: "Coral Beach", icon: "🏖️", difficulty: "easy" },
-            { name: "Palm Cove", icon: "🌴", difficulty: "easy" },
-            { name: "Sunset Bay", icon: "🌅", difficulty: "easy" },
-            { name: "Hidden Lagoon", icon: "🏞️", difficulty: "medium" },
-            { name: "Tide Pools", icon: "🐚", difficulty: "medium" },
-            { name: "Ocean View", icon: "🌊", difficulty: "medium" },
-            { name: "Reef Gardens", icon: "🐠", difficulty: "medium" },
-            { name: "Dolphin Point", icon: "🐬", difficulty: "hard" },
-            { name: "Whale Watch", icon: "🐋", difficulty: "hard" },
-            { name: "Storm Island", icon: "⛈️", difficulty: "hard" },
-            { name: "Pirate Cove", icon: "🏴‍☠️", difficulty: "hard" },
-            { name: "Volcano Peak", icon: "🌋", difficulty: "hard" },
-            { name: "Crystal Caves", icon: "💎", difficulty: "expert" },
-            { name: "Mystic Falls", icon: "🌊", difficulty: "expert" },
-            { name: "Dragon's Lair", icon: "🐉", difficulty: "expert" },
-            { name: "Phoenix Nest", icon: "🔥", difficulty: "expert" },
-            { name: "Starlight Summit", icon: "⭐", difficulty: "expert" },
-            { name: "Thunder Ridge", icon: "⚡", difficulty: "expert" },
-            { name: "Frozen Peaks", icon: "🏔️", difficulty: "expert" },
-            { name: "Shadow Valley", icon: "🌑", difficulty: "expert" },
-            { name: "Golden Temple", icon: "🏛️", difficulty: "expert" },
-            { name: "Master's Paradise", icon: "👑", difficulty: "expert" }
+            { name: 'Coral Beach', icon: '🏖️', difficulty: 'easy' },
+            { name: 'Palm Cove', icon: '🌴', difficulty: 'easy' },
+            { name: 'Sunset Bay', icon: '🌅', difficulty: 'easy' },
+            { name: 'Hidden Lagoon', icon: '🏞️', difficulty: 'medium' },
+            { name: 'Tide Pools', icon: '🐚', difficulty: 'medium' },
+            { name: 'Ocean View', icon: '🌊', difficulty: 'medium' },
+            { name: 'Reef Gardens', icon: '🐠', difficulty: 'medium' },
+            { name: 'Dolphin Point', icon: '🐬', difficulty: 'hard' },
+            { name: 'Whale Watch', icon: '🐋', difficulty: 'hard' },
+            { name: 'Storm Island', icon: '⛈️', difficulty: 'hard' },
+            { name: 'Pirate Cove', icon: '🏴‍☠️', difficulty: 'hard' },
+            { name: 'Volcano Peak', icon: '🌋', difficulty: 'hard' },
+            { name: 'Crystal Caves', icon: '💎', difficulty: 'expert' },
+            { name: 'Mystic Falls', icon: '🌊', difficulty: 'expert' },
+            { name: "Dragon's Lair", icon: '🐉', difficulty: 'expert' },
+            { name: 'Phoenix Nest', icon: '🔥', difficulty: 'expert' },
+            { name: 'Starlight Summit', icon: '⭐', difficulty: 'expert' },
+            { name: 'Thunder Ridge', icon: '⚡', difficulty: 'expert' },
+            { name: 'Frozen Peaks', icon: '🏔️', difficulty: 'expert' },
+            { name: 'Shadow Valley', icon: '🌑', difficulty: 'expert' },
+            { name: 'Golden Temple', icon: '🏛️', difficulty: 'expert' },
+            { name: "Master's Paradise", icon: '👑', difficulty: 'expert' }
         ];
-        
+
         this.initializeElements();
         this.setupEventListeners();
     }
@@ -38,11 +38,11 @@ class TournamentUI {
         this.tournamentTimeLeft = document.getElementById('tournament-time-left');
         this.tournamentCurrentScore = document.getElementById('tournament-current-score');
         this.currentRank = document.getElementById('current-rank');
-        
+
         this.tournamentLevels = document.getElementById('tournament-levels');
         this.leaderboardBtn = document.getElementById('tournament-leaderboard-btn');
         this.rulesBtn = document.getElementById('tournament-rules-btn');
-        
+
         // Level modal elements
         this.levelModal = document.getElementById('level-detail-modal');
         this.modalLevelIcon = document.getElementById('modal-level-icon');
@@ -54,7 +54,7 @@ class TournamentUI {
         this.levelBestScore = document.getElementById('level-best-score');
         this.closeLevelModalBtn = document.getElementById('close-level-modal-btn');
         this.playLevelBtn = document.getElementById('play-level-btn');
-        
+
         // Leaderboard modal elements
         this.leaderboardModal = document.getElementById('leaderboard-modal');
         this.leaderboardContent = document.getElementById('leaderboard-content');
@@ -64,23 +64,23 @@ class TournamentUI {
     setupEventListeners() {
         this.leaderboardBtn?.addEventListener('click', () => this.showLeaderboard());
         this.rulesBtn?.addEventListener('click', () => this.showRules());
-        
+
         this.closeLevelModalBtn?.addEventListener('click', () => this.closeLevelModal());
         this.playLevelBtn?.addEventListener('click', () => this.playSelectedLevel());
-        this.levelModal?.addEventListener('click', (e) => {
+        this.levelModal?.addEventListener('click', e => {
             if (e.target === this.levelModal) {
                 this.closeLevelModal();
             }
         });
-        
+
         this.closeLeaderboardBtn?.addEventListener('click', () => this.closeLeaderboard());
-        this.leaderboardModal?.addEventListener('click', (e) => {
+        this.leaderboardModal?.addEventListener('click', e => {
             if (e.target === this.leaderboardModal) {
                 this.closeLeaderboard();
             }
         });
-        
-        document.addEventListener('keydown', (e) => {
+
+        document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
                 if (!this.levelModal?.classList.contains('hidden')) {
                     this.closeLevelModal();
@@ -96,7 +96,7 @@ class TournamentUI {
         this.renderTournamentInfo();
         this.renderLevels();
         this.updateTimer();
-        
+
         // Update timer every minute
         setInterval(() => this.updateTimer(), 60000);
     }
@@ -108,26 +108,26 @@ class TournamentUI {
     }
 
     renderTournamentInfo() {
-        if (!window.userProgress) return;
-        
+        if (!window.userProgress) { return; }
+
         const tournamentProgress = window.userProgress.getTournamentProgress();
         const completedLevels = tournamentProgress.completedLevels.length;
-        
+
         // Update completed levels
         if (this.levelsCompleted) {
             this.levelsCompleted.textContent = completedLevels;
         }
-        
+
         // Update tournament score
         if (this.tournamentCurrentScore) {
             this.tournamentCurrentScore.textContent = tournamentProgress.totalScore.toLocaleString();
         }
-        
+
         // Update participants (simulated)
         if (this.participantsCount) {
             this.participantsCount.textContent = Math.floor(Math.random() * 50) + 75; // 75-125 players
         }
-        
+
         // Update rank (simulated based on completed levels and score)
         if (this.currentRank) {
             const rank = this.calculateUserRank(completedLevels, tournamentProgress.totalScore);
@@ -137,21 +137,21 @@ class TournamentUI {
 
     calculateUserRank(completedLevels, totalScore) {
         // Simulate ranking based on progress
-        if (completedLevels === 0) return Math.floor(Math.random() * 20) + 80;
-        if (completedLevels < 5) return Math.floor(Math.random() * 15) + 50;
-        if (completedLevels < 10) return Math.floor(Math.random() * 10) + 25;
-        if (completedLevels < 15) return Math.floor(Math.random() * 8) + 10;
-        if (completedLevels < 20) return Math.floor(Math.random() * 5) + 3;
+        if (completedLevels === 0) { return Math.floor(Math.random() * 20) + 80; }
+        if (completedLevels < 5) { return Math.floor(Math.random() * 15) + 50; }
+        if (completedLevels < 10) { return Math.floor(Math.random() * 10) + 25; }
+        if (completedLevels < 15) { return Math.floor(Math.random() * 8) + 10; }
+        if (completedLevels < 20) { return Math.floor(Math.random() * 5) + 3; }
         return Math.floor(Math.random() * 2) + 1;
     }
 
     updateTimer() {
-        if (!this.tournamentTimeLeft) return;
-        
+        if (!this.tournamentTimeLeft) { return; }
+
         const now = new Date();
         const nextWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + 7);
         const timeRemaining = nextWeek.getTime() - now.getTime();
-        
+
         if (timeRemaining > 0) {
             const days = Math.floor(timeRemaining / (24 * 60 * 60 * 1000));
             const hours = Math.floor((timeRemaining % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
@@ -162,14 +162,14 @@ class TournamentUI {
     }
 
     renderLevels() {
-        if (!this.tournamentLevels || !window.userProgress) return;
-        
+        if (!this.tournamentLevels || !window.userProgress) { return; }
+
         const tournamentProgress = window.userProgress.getTournamentProgress();
-        const completedLevels = tournamentProgress.completedLevels;
-        const currentLevel = tournamentProgress.currentLevel;
-        
+        const { completedLevels } = tournamentProgress;
+        const { currentLevel } = tournamentProgress;
+
         this.tournamentLevels.innerHTML = '';
-        
+
         for (let i = 1; i <= 22; i++) {
             const levelElement = this.createLevelElement(i, completedLevels, currentLevel);
             this.tournamentLevels.appendChild(levelElement);
@@ -181,10 +181,10 @@ class TournamentUI {
         const isCompleted = completedLevels.includes(levelNumber);
         const isCurrent = levelNumber === currentLevel;
         const isLocked = levelNumber > currentLevel;
-        
+
         const levelElement = document.createElement('div');
         levelElement.className = 'level-node';
-        
+
         if (isCompleted) {
             levelElement.classList.add('completed');
         } else if (isCurrent) {
@@ -192,37 +192,37 @@ class TournamentUI {
         } else if (isLocked) {
             levelElement.classList.add('locked');
         }
-        
+
         const levelContent = document.createElement('div');
         levelContent.className = 'level-content';
-        
+
         const levelIcon = document.createElement('div');
         levelIcon.className = 'level-icon';
         levelIcon.textContent = isLocked ? '🔒' : levelData.icon;
-        
+
         const levelNum = document.createElement('div');
         levelNum.className = 'level-number';
         levelNum.textContent = levelNumber;
-        
+
         levelContent.appendChild(levelIcon);
         levelContent.appendChild(levelNum);
-        
+
         // Add stars for completed levels
         if (isCompleted) {
             const stars = this.getStarsForLevel(levelNumber);
             const starsElement = document.createElement('div');
             starsElement.className = 'level-stars';
-            
+
             for (let i = 0; i < 3; i++) {
                 const star = document.createElement('span');
                 star.className = 'star';
                 star.textContent = i < stars ? '⭐' : '☆';
                 starsElement.appendChild(star);
             }
-            
+
             levelElement.appendChild(starsElement);
         }
-        
+
         // Add path connector (except for last level)
         if (levelNumber < 22) {
             const pathElement = document.createElement('div');
@@ -232,20 +232,20 @@ class TournamentUI {
             }
             levelElement.appendChild(pathElement);
         }
-        
+
         levelElement.appendChild(levelContent);
-        
+
         // Add click handler
         if (!isLocked) {
             levelElement.addEventListener('click', () => this.showLevelDetails(levelNumber));
         }
-        
+
         return levelElement;
     }
 
     getStarsForLevel(levelNumber) {
-        if (!window.userProgress) return 0;
-        
+        if (!window.userProgress) { return 0; }
+
         // Simulate star rating based on performance
         // In a real implementation, this would be stored with level completion data
         const hash = levelNumber * 37; // Simple hash for consistency
@@ -253,52 +253,52 @@ class TournamentUI {
     }
 
     showLevelDetails(levelNumber) {
-        if (!window.userProgress) return;
-        
+        if (!window.userProgress) { return; }
+
         const levelData = this.levelData[levelNumber - 1];
         const tournamentProgress = window.userProgress.getTournamentProgress();
         const isCompleted = tournamentProgress.completedLevels.includes(levelNumber);
         const isCurrent = levelNumber === tournamentProgress.currentLevel;
-        
+
         this.selectedLevel = levelNumber;
-        
+
         // Update modal header
         if (this.modalLevelIcon) {
             this.modalLevelIcon.textContent = levelData.icon;
         }
-        
+
         if (this.modalLevelName) {
             this.modalLevelName.textContent = levelData.name;
         }
-        
+
         if (this.modalLevelNumber) {
             this.modalLevelNumber.textContent = `Level ${levelNumber}`;
         }
-        
+
         // Update status
         this.updateLevelStatus(levelNumber, isCompleted, isCurrent);
-        
+
         // Update constraints
         this.updateLevelConstraints(levelNumber);
-        
+
         // Update rewards
         this.updateLevelRewards(levelNumber);
-        
+
         // Update best score
         this.updateLevelBestScore(levelNumber, isCompleted);
-        
+
         // Update play button
         this.updatePlayButton(levelNumber, isCompleted, isCurrent);
-        
+
         // Show modal
         this.levelModal?.classList.remove('hidden');
     }
 
     updateLevelStatus(levelNumber, isCompleted, isCurrent) {
-        if (!this.levelStatus) return;
-        
+        if (!this.levelStatus) { return; }
+
         let statusHTML = '';
-        
+
         if (isCompleted) {
             const stars = this.getStarsForLevel(levelNumber);
             const starDisplay = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
@@ -311,17 +311,17 @@ class TournamentUI {
         } else {
             statusHTML = '<div class="status-badge locked">🔒 Locked</div>';
         }
-        
+
         this.levelStatus.innerHTML = statusHTML;
     }
 
     updateLevelConstraints(levelNumber) {
-        if (!this.levelConstraints) return;
-        
+        if (!this.levelConstraints) { return; }
+
         const constraints = this.getLevelConstraints(levelNumber);
-        
+
         let constraintsHTML = '<h4>Level Constraints</h4>';
-        
+
         constraints.forEach(constraint => {
             constraintsHTML += `
                 <div class="constraint-item">
@@ -330,13 +330,13 @@ class TournamentUI {
                 </div>
             `;
         });
-        
+
         this.levelConstraints.innerHTML = constraintsHTML;
     }
 
     getLevelConstraints(levelNumber) {
         const constraints = [];
-        
+
         // Add constraints based on level
         if (levelNumber > 15) {
             constraints.push({
@@ -344,38 +344,38 @@ class TournamentUI {
                 text: `Time limit: ${Math.max(5, 15 - levelNumber)} minutes`
             });
         }
-        
+
         if (levelNumber > 18) {
             constraints.push({
                 icon: '🚫',
                 text: 'No hints allowed'
             });
         }
-        
+
         if (levelNumber > 20) {
             constraints.push({
                 icon: '💯',
                 text: 'Perfect play required (no mistakes)'
             });
         }
-        
+
         if (constraints.length === 0) {
             constraints.push({
                 icon: '🎯',
                 text: 'Standard Sudoku rules apply'
             });
         }
-        
+
         return constraints;
     }
 
     updateLevelRewards(levelNumber) {
-        if (!this.levelRewards) return;
-        
+        if (!this.levelRewards) { return; }
+
         const rewards = this.getLevelRewards(levelNumber);
-        
+
         let rewardsHTML = '<h4>Completion Rewards</h4>';
-        
+
         rewards.forEach(reward => {
             rewardsHTML += `
                 <div class="reward-item">
@@ -384,20 +384,20 @@ class TournamentUI {
                 </div>
             `;
         });
-        
+
         this.levelRewards.innerHTML = rewardsHTML;
     }
 
     getLevelRewards(levelNumber) {
         const basePoints = levelNumber * 100 + Math.floor(levelNumber / 5) * 250;
-        
+
         const rewards = [
             {
                 icon: '💎',
                 text: `${basePoints.toLocaleString()} Tournament Points`
             }
         ];
-        
+
         // Bonus rewards for milestones
         if (levelNumber % 5 === 0) {
             rewards.push({
@@ -405,35 +405,35 @@ class TournamentUI {
                 text: 'Milestone Achievement'
             });
         }
-        
+
         if (levelNumber === 22) {
             rewards.push({
                 icon: '👑',
                 text: 'Tournament Champion Title'
             });
         }
-        
+
         return rewards;
     }
 
     updateLevelBestScore(levelNumber, isCompleted) {
-        if (!this.levelBestScore) return;
-        
+        if (!this.levelBestScore) { return; }
+
         if (!isCompleted) {
             this.levelBestScore.innerHTML = '';
             return;
         }
-        
+
         // Simulate best score data
         const bestScore = (levelNumber * 1000 + Math.floor(Math.random() * 500)) * (1 + levelNumber * 0.1);
         const bestTime = Math.floor(Math.random() * 600000) + 180000; // 3-13 minutes
-        
-        const formatTime = (ms) => {
+
+        const formatTime = ms => {
             const minutes = Math.floor(ms / 60000);
             const seconds = Math.floor((ms % 60000) / 1000);
             return `${minutes}:${seconds.toString().padStart(2, '0')}`;
         };
-        
+
         this.levelBestScore.innerHTML = `
             <h4>Your Best Performance</h4>
             <div class="stat-row">
@@ -448,8 +448,8 @@ class TournamentUI {
     }
 
     updatePlayButton(levelNumber, isCompleted, isCurrent) {
-        if (!this.playLevelBtn) return;
-        
+        if (!this.playLevelBtn) { return; }
+
         if (isCompleted) {
             this.playLevelBtn.innerHTML = '<span>🔄 Replay Level</span>';
             this.playLevelBtn.disabled = false;
@@ -463,10 +463,10 @@ class TournamentUI {
     }
 
     playSelectedLevel() {
-        if (!this.selectedLevel || !window.gameUI) return;
-        
+        if (!this.selectedLevel || !window.gameUI) { return; }
+
         this.closeLevelModal();
-        
+
         try {
             const puzzleData = window.gameUI.generator.generateTournamentLevel(
                 this.selectedLevel,
@@ -480,17 +480,17 @@ class TournamentUI {
     }
 
     showLeaderboard() {
-        if (!this.leaderboardContent) return;
-        
+        if (!this.leaderboardContent) { return; }
+
         const leaderboardData = this.generateLeaderboardData();
-        
+
         let leaderboardHTML = '';
-        
+
         leaderboardData.forEach((player, index) => {
             const rank = index + 1;
             let rankClass = '';
             let rankDisplay = `#${rank}`;
-            
+
             if (rank === 1) {
                 rankClass = 'first';
                 rankDisplay = '🥇';
@@ -501,7 +501,7 @@ class TournamentUI {
                 rankClass = 'third';
                 rankDisplay = '🥉';
             }
-            
+
             leaderboardHTML += `
                 <div class="leaderboard-item ${player.isUser ? 'current-user' : ''}">
                     <div class="leaderboard-rank ${rankClass}">${rankDisplay}</div>
@@ -513,17 +513,17 @@ class TournamentUI {
                 </div>
             `;
         });
-        
+
         this.leaderboardContent.innerHTML = leaderboardHTML;
         this.leaderboardModal?.classList.remove('hidden');
     }
 
     generateLeaderboardData() {
-        const userProgress = window.userProgress ? window.userProgress.getTournamentProgress() : 
-                           { completedLevels: [], totalScore: 0 };
-        
+        const userProgress = window.userProgress ? window.userProgress.getTournamentProgress()
+            : { completedLevels: [], totalScore: 0 };
+
         const players = [];
-        
+
         // Add current user
         players.push({
             name: 'You',
@@ -531,29 +531,29 @@ class TournamentUI {
             score: userProgress.totalScore,
             isUser: true
         });
-        
+
         // Generate mock players
         const names = [
             'PuzzleMaster', 'SudokuPro', 'GridWizard', 'NumberNinja', 'LogicLord',
             'BrainBox', 'MindBender', 'ThinkTank', 'QuickSolver', 'MathGenius',
             'PatternKing', 'DigitDancer', 'CellCrusher', 'RowRuler', 'ColChamp'
         ];
-        
+
         for (let i = 0; i < 14; i++) {
             const levelsCompleted = Math.floor(Math.random() * 22) + 1;
             const avgScorePerLevel = 1000 + Math.random() * 2000;
-            
+
             players.push({
                 name: names[i] || `Player${i + 1}`,
-                levelsCompleted: levelsCompleted,
+                levelsCompleted,
                 score: Math.floor(levelsCompleted * avgScorePerLevel),
                 isUser: false
             });
         }
-        
+
         // Sort by score descending
         players.sort((a, b) => b.score - a.score);
-        
+
         return players.slice(0, 15); // Top 15 players
     }
 
@@ -605,7 +605,7 @@ class TournamentUI {
                 </div>
             </div>
         `;
-        
+
         document.body.appendChild(rulesModal);
     }
 

@@ -4,12 +4,12 @@
   "description": "A comprehensive Sudoku Progressive Web App with tournaments, daily challenges, and offline support",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve . -p 3000 -s",
-    "dev": "npx live-server --port=3000 --open=/",
+    "start": "python3 -m http.server 3000",
+    "dev": "python3 -m http.server 3000",
     "build": "node build/build.js",
     "build:dev": "node build/build.js --no-minify",
     "build:analyze": "node build/build.js --source-maps",
-    "test": "npx serve test -p 3001 --open=/test-runner.html",
+    "test": "node test/headless-runner.js",
     "test:headless": "node test/headless-runner.js",
     "lint": "npx eslint js/ --ext .js",
     "lint:fix": "npx eslint js/ --ext .js --fix",
@@ -52,11 +52,8 @@
   "homepage": "https://sudoku-pwa.netlify.app",
   "devDependencies": {
     "eslint": "^8.0.0",
-    "prettier": "^3.0.0",
-    "live-server": "^1.2.2",
-    "serve": "^14.0.0",
-    "lighthouse": "^11.0.0",
-    "gh-pages": "^6.0.0"
+    "gh-pages": "^6.0.0",
+    "prettier": "^3.0.0"
   },
   "browserslist": [
     "last 2 Chrome versions",

@@ -9,19 +9,19 @@ class PerformanceMonitor {
             user: {},
             errors: []
         };
-        
+
         this.observers = {};
         this.startTime = performance.now();
         this.isSupported = this.checkSupport();
         this.thresholds = {
             fcp: 1500, // First Contentful Paint
             lcp: 2500, // Largest Contentful Paint
-            fid: 100,  // First Input Delay
-            cls: 0.1,  // Cumulative Layout Shift
+            fid: 100, // First Input Delay
+            cls: 0.1, // Cumulative Layout Shift
             ttfb: 800, // Time to First Byte
             memory: 50 * 1024 * 1024 // 50MB
         };
-        
+
         if (this.isSupported) {
             this.initialize();
         }
@@ -29,10 +29,10 @@ class PerformanceMonitor {
 
     checkSupport() {
         return !!(
-            performance &&
-            performance.mark &&
-            performance.measure &&
-            performance.getEntriesByType
+            performance
+            && performance.mark
+            && performance.measure
+            && performance.getEntriesByType
         );
     }
 
@@ -43,7 +43,7 @@ class PerformanceMonitor {
         this.setupErrorTracking();
         this.startMemoryMonitoring();
         this.setupUserInteractionTracking();
-        
+
         // Report metrics periodically
         setInterval(() => this.reportMetrics(), 30000); // Every 30 seconds
     }
@@ -52,7 +52,7 @@ class PerformanceMonitor {
         // Largest Contentful Paint
         if ('PerformanceObserver' in window) {
             try {
-                const lcpObserver = new PerformanceObserver((list) => {
+                const lcpObserver = new PerformanceObserver(list => {
                     const entries = list.getEntries();
                     const lastEntry = entries[entries.length - 1];
                     this.metrics.pageLoad.lcp = Math.round(lastEntry.startTime);
@@ -66,9 +66,9 @@ class PerformanceMonitor {
 
             // First Input Delay
             try {
-                const fidObserver = new PerformanceObserver((list) => {
+                const fidObserver = new PerformanceObserver(list => {
                     const entries = list.getEntries();
-                    entries.forEach((entry) => {
+                    entries.forEach(entry => {
                         this.metrics.pageLoad.fid = Math.round(entry.processingStart - entry.startTime);
                         this.checkThreshold('fid', this.metrics.pageLoad.fid);
                     });
@@ -81,10 +81,10 @@ class PerformanceMonitor {
 
             // Cumulative Layout Shift
             try {
-                const clsObserver = new PerformanceObserver((list) => {
+                const clsObserver = new PerformanceObserver(list => {
                     let clsValue = 0;
                     const entries = list.getEntries();
-                    entries.forEach((entry) => {
+                    entries.forEach(entry => {
                         if (!entry.hadRecentInput) {
                             clsValue += entry.value;
                         }
@@ -100,18 +100,18 @@ class PerformanceMonitor {
 
             // Long Tasks
             try {
-                const longTaskObserver = new PerformanceObserver((list) => {
+                const longTaskObserver = new PerformanceObserver(list => {
                     const entries = list.getEntries();
-                    entries.forEach((entry) => {
+                    entries.forEach(entry => {
                         const taskData = {
                             duration: Math.round(entry.duration),
                             startTime: Math.round(entry.startTime),
                             name: entry.name
                         };
-                        
+
                         this.metrics.rendering.longTasks = this.metrics.rendering.longTasks || [];
                         this.metrics.rendering.longTasks.push(taskData);
-                        
+
                         // Alert on tasks over 50ms
                         if (entry.duration > 50) {
                             this.trackIssue('long-task', `Task took ${Math.round(entry.duration)}ms`);
@@ -126,9 +126,9 @@ class PerformanceMonitor {
 
             // Navigation timing
             try {
-                const navObserver = new PerformanceObserver((list) => {
+                const navObserver = new PerformanceObserver(list => {
                     const entries = list.getEntries();
-                    entries.forEach((entry) => {
+                    entries.forEach(entry => {
                         this.metrics.navigation = {
                             type: entry.type,
                             redirectCount: entry.redirectCount,
@@ -158,10 +158,10 @@ class PerformanceMonitor {
     }
 
     calculatePageLoadMetrics() {
-        if (!performance.timing) return;
+        if (!performance.timing) { return; }
 
-        const timing = performance.timing;
-        const navigation = performance.navigation;
+        const { timing } = performance;
+        const { navigation } = performance;
 
         this.metrics.pageLoad = {
             ...this.metrics.pageLoad,
@@ -188,7 +188,7 @@ class PerformanceMonitor {
         // Simple TTI estimation based on when main thread becomes quiet
         const longTasks = performance.getEntriesByType('longtask');
         const lastLongTask = longTasks[longTasks.length - 1];
-        
+
         if (lastLongTask) {
             this.metrics.pageLoad.tti = Math.round(lastLongTask.startTime + lastLongTask.duration);
         } else if (this.metrics.pageLoad.domComplete) {
@@ -198,7 +198,7 @@ class PerformanceMonitor {
 
     trackNetworkInformation() {
         if ('navigator' in window && 'connection' in navigator) {
-            const connection = navigator.connection;
+            const { connection } = navigator;
             this.metrics.network = {
                 effectiveType: connection.effectiveType,
                 downlink: connection.downlink,
@@ -210,7 +210,7 @@ class PerformanceMonitor {
                 this.metrics.network.effectiveType = connection.effectiveType;
                 this.metrics.network.downlink = connection.downlink;
                 this.metrics.network.rtt = connection.rtt;
-                
+
                 if (connection.effectiveType === 'slow-2g') {
                     this.trackIssue('slow-connection', 'User on slow 2G connection');
                 }
@@ -221,7 +221,7 @@ class PerformanceMonitor {
     startMemoryMonitoring() {
         if ('memory' in performance) {
             const updateMemoryMetrics = () => {
-                const memory = performance.memory;
+                const { memory } = performance;
                 this.metrics.memory = {
                     usedJSHeapSize: memory.usedJSHeapSize,
                     totalJSHeapSize: memory.totalJSHeapSize,
@@ -246,7 +246,7 @@ class PerformanceMonitor {
         const interactionTypes = ['click', 'keydown', 'touchstart'];
 
         interactionTypes.forEach(type => {
-            document.addEventListener(type, (e) => {
+            document.addEventListener(type, e => {
                 interactionCount++;
                 this.measureInteractionDelay(e, type);
             }, { passive: true });
@@ -259,11 +259,11 @@ class PerformanceMonitor {
         document.addEventListener('scroll', () => {
             const now = performance.now();
             const deltaTime = now - lastScrollTime;
-            
+
             if (lastScrollTime > 0 && deltaTime > 32) { // More than 2 frames at 60fps
                 scrollFrameDrops++;
             }
-            
+
             lastScrollTime = now;
             this.metrics.user.scrollFrameDrops = scrollFrameDrops;
         }, { passive: true });
@@ -271,15 +271,15 @@ class PerformanceMonitor {
 
     measureInteractionDelay(event, type) {
         const startTime = performance.now();
-        
+
         requestAnimationFrame(() => {
             const endTime = performance.now();
             const delay = endTime - startTime;
-            
+
             if (!this.metrics.user.interactionDelays) {
                 this.metrics.user.interactionDelays = [];
             }
-            
+
             this.metrics.user.interactionDelays.push({
                 type,
                 delay: Math.round(delay),
@@ -294,7 +294,7 @@ class PerformanceMonitor {
 
     setupErrorTracking() {
         // JavaScript errors
-        window.addEventListener('error', (event) => {
+        window.addEventListener('error', event => {
             this.trackError({
                 type: 'javascript',
                 message: event.message,
@@ -307,7 +307,7 @@ class PerformanceMonitor {
         });
 
         // Promise rejections
-        window.addEventListener('unhandledrejection', (event) => {
+        window.addEventListener('unhandledrejection', event => {
             this.trackError({
                 type: 'unhandled-promise',
                 message: event.reason?.message || 'Unhandled promise rejection',
@@ -317,7 +317,7 @@ class PerformanceMonitor {
         });
 
         // Resource loading errors
-        document.addEventListener('error', (event) => {
+        document.addEventListener('error', event => {
             if (event.target !== window) {
                 this.trackError({
                     type: 'resource',
@@ -331,7 +331,7 @@ class PerformanceMonitor {
 
     trackError(errorData) {
         this.metrics.errors.push(errorData);
-        
+
         // Keep only recent errors
         this.metrics.errors = this.metrics.errors
             .filter(error => Date.now() - error.timestamp < 300000); // Last 5 minutes
@@ -344,7 +344,7 @@ class PerformanceMonitor {
         if (!this.metrics.issues) {
             this.metrics.issues = [];
         }
-        
+
         this.metrics.issues.push({
             type,
             message,
@@ -393,11 +393,11 @@ class PerformanceMonitor {
         if (!this.metrics.user.functionTimings) {
             this.metrics.user.functionTimings = {};
         }
-        
+
         if (!this.metrics.user.functionTimings[name]) {
             this.metrics.user.functionTimings[name] = [];
         }
-        
+
         this.metrics.user.functionTimings[name].push(Math.round(duration));
 
         // Keep only recent measurements
@@ -417,11 +417,11 @@ class PerformanceMonitor {
         if (!this.metrics.user.asyncTimings) {
             this.metrics.user.asyncTimings = {};
         }
-        
+
         if (!this.metrics.user.asyncTimings[name]) {
             this.metrics.user.asyncTimings[name] = [];
         }
-        
+
         this.metrics.user.asyncTimings[name].push(Math.round(duration));
 
         return result;
@@ -467,7 +467,7 @@ class PerformanceMonitor {
     trackGameComplete(result) {
         this.mark('game-complete');
         const duration = this.measure('game-duration', 'game-start', 'game-complete');
-        
+
         this.trackUserAction('game-complete', {
             ...result,
             duration
@@ -479,8 +479,8 @@ class PerformanceMonitor {
             start: () => this.mark(`puzzle-gen-start-${difficulty}`),
             end: () => {
                 this.mark(`puzzle-gen-end-${difficulty}`);
-                return this.measure(`puzzle-generation-${difficulty}`, 
-                    `puzzle-gen-start-${difficulty}`, 
+                return this.measure(`puzzle-generation-${difficulty}`,
+                    `puzzle-gen-start-${difficulty}`,
                     `puzzle-gen-end-${difficulty}`);
             }
         };
@@ -547,7 +547,7 @@ class PerformanceMonitor {
 
     getRecommendations() {
         const recommendations = [];
-        const metrics = this.metrics;
+        const { metrics } = this;
 
         if (metrics.pageLoad.fcp > this.thresholds.fcp) {
             recommendations.push({
@@ -594,7 +594,7 @@ class PerformanceMonitor {
 
     reportMetrics() {
         const report = this.generateReport();
-        
+
         // Log to console in development
         if (process?.env?.NODE_ENV === 'development') {
             console.log('Performance Report:', report);
@@ -687,9 +687,7 @@ const PerformanceUtils = {
     },
 
     // Check if page is visible
-    isPageVisible: () => {
-        return document.visibilityState === 'visible';
-    }
+    isPageVisible: () => document.visibilityState === 'visible'
 };
 
 // Make available globally

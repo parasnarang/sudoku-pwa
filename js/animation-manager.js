@@ -22,7 +22,7 @@ class AnimationManager {
                 spring: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
             }
         };
-        
+
         this.setupAnimationStyles();
         this.bindMotionPreference();
         this.initializeInteractionAnimations();
@@ -402,21 +402,21 @@ class AnimationManager {
                 to { box-shadow: 0 0 20px rgba(33, 150, 243, 0.6), 0 0 30px rgba(33, 150, 243, 0.3); }
             }
         `;
-        
+
         document.head.appendChild(styles);
     }
 
     bindMotionPreference() {
         const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        
-        const handleChange = (e) => {
+
+        const handleChange = e => {
             this.prefersReducedMotion = e.matches;
             document.documentElement.style.setProperty(
-                '--animation-duration', 
+                '--animation-duration',
                 e.matches ? '0.01ms' : '300ms'
             );
         };
-        
+
         mediaQuery.addEventListener('change', handleChange);
         handleChange(mediaQuery);
     }
@@ -424,13 +424,13 @@ class AnimationManager {
     initializeInteractionAnimations() {
         // Add interactive classes to buttons and clickable elements
         this.addInteractiveClasses();
-        
+
         // Setup ripple effects
         this.setupRippleEffects();
-        
+
         // Setup hover animations
         this.setupHoverAnimations();
-        
+
         // Setup focus animations
         this.setupFocusAnimations();
     }
@@ -439,7 +439,7 @@ class AnimationManager {
         const interactiveElements = document.querySelectorAll(
             'button, .nav-item, .challenge-card, .stat-card, .sudoku-cell, .number-btn, .action-btn, .level-node'
         );
-        
+
         interactiveElements.forEach(element => {
             element.classList.add('interactive');
         });
@@ -447,7 +447,7 @@ class AnimationManager {
 
     setupRippleEffects() {
         const rippleElements = document.querySelectorAll('.number-btn, .action-btn, .nav-item');
-        
+
         rippleElements.forEach(element => {
             element.classList.add('ripple');
         });
@@ -456,7 +456,7 @@ class AnimationManager {
     setupHoverAnimations() {
         // Enhanced hover effects for cards
         const cards = document.querySelectorAll('.challenge-card, .stat-card, .settings-section');
-        
+
         cards.forEach(card => {
             card.addEventListener('mouseenter', () => {
                 if (!this.prefersReducedMotion) {
@@ -464,7 +464,7 @@ class AnimationManager {
                     card.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15)';
                 }
             });
-            
+
             card.addEventListener('mouseleave', () => {
                 card.style.transform = '';
                 card.style.boxShadow = '';
@@ -475,7 +475,7 @@ class AnimationManager {
     setupFocusAnimations() {
         // Enhanced focus states for accessibility
         const focusableElements = document.querySelectorAll('button, input, select, [tabindex]');
-        
+
         focusableElements.forEach(element => {
             element.addEventListener('focus', () => {
                 if (!this.prefersReducedMotion) {
@@ -484,7 +484,7 @@ class AnimationManager {
                     element.style.boxShadow = '0 0 0 4px rgba(33, 150, 243, 0.2)';
                 }
             });
-            
+
             element.addEventListener('blur', () => {
                 element.style.outline = '';
                 element.style.outlineOffset = '';
@@ -509,8 +509,8 @@ class AnimationManager {
         } = options;
 
         const animationName = `animate-${animation}`;
-        
-        return new Promise((resolve) => {
+
+        return new Promise(resolve => {
             const handleAnimationEnd = () => {
                 element.classList.remove(animationName);
                 element.removeEventListener('animationend', handleAnimationEnd);
@@ -518,7 +518,7 @@ class AnimationManager {
             };
 
             // Set custom properties
-            element.style.setProperty('--animation-duration', 
+            element.style.setProperty('--animation-duration',
                 typeof duration === 'number' ? `${duration}ms` : `${this.animationSettings.duration[duration]}ms`
             );
             element.style.setProperty('--animation-easing', this.animationSettings.easing[easing]);
@@ -527,7 +527,7 @@ class AnimationManager {
             element.style.setProperty('--animation-iteration-count', iterations);
 
             element.addEventListener('animationend', handleAnimationEnd);
-            
+
             setTimeout(() => {
                 element.classList.add(animationName);
             }, delay);
@@ -535,7 +535,7 @@ class AnimationManager {
     }
 
     // Game-specific animation methods
-    
+
     animateNumberEntry(cell, number) {
         cell.textContent = number;
         return this.animate(cell, 'number-entry', { duration: 'fast', easing: 'bounce' });
@@ -616,11 +616,11 @@ class AnimationManager {
     addLoadingState(button, text = 'Loading...') {
         const originalText = button.textContent;
         const originalDisabled = button.disabled;
-        
+
         button.textContent = text;
         button.disabled = true;
         button.classList.add('loading');
-        
+
         // Add spinner
         const spinner = document.createElement('div');
         spinner.className = 'loading-spinner';
@@ -634,7 +634,7 @@ class AnimationManager {
             margin-right: 8px;
         `;
         button.insertBefore(spinner, button.firstChild);
-        
+
         return {
             remove: () => {
                 button.textContent = originalText;
@@ -650,7 +650,7 @@ class AnimationManager {
     // Stagger animations
     staggerAnimate(elements, animation, options = {}) {
         const { staggerDelay = 50 } = options;
-        
+
         return Promise.all(
             Array.from(elements).map((element, index) =>
                 this.animate(element, animation, {
@@ -703,28 +703,28 @@ const AnimationUtils = {
         }
         return Promise.resolve();
     },
-    
+
     fadeOut: (element, duration = 300) => {
         if (window.animationManager) {
             return window.animationManager.animate(element, 'fade-out', { duration });
         }
         return Promise.resolve();
     },
-    
+
     slideUp: (element, duration = 300) => {
         if (window.animationManager) {
             return window.animationManager.animate(element, 'slide-in-up', { duration });
         }
         return Promise.resolve();
     },
-    
+
     bounce: (element, duration = 600) => {
         if (window.animationManager) {
             return window.animationManager.animate(element, 'bounce', { duration });
         }
         return Promise.resolve();
     },
-    
+
     shake: (element, duration = 500) => {
         if (window.animationManager) {
             return window.animationManager.animate(element, 'shake', { duration });

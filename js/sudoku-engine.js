@@ -1,8 +1,11 @@
 class SudokuEngine {
     constructor() {
-        this.grid = Array(9).fill(null).map(() => Array(9).fill(0));
-        this.originalGrid = Array(9).fill(null).map(() => Array(9).fill(0));
-        this.solution = Array(9).fill(null).map(() => Array(9).fill(0));
+        this.grid = Array(9).fill(null)
+            .map(() => Array(9).fill(0));
+        this.originalGrid = Array(9).fill(null)
+            .map(() => Array(9).fill(0));
+        this.solution = Array(9).fill(null)
+            .map(() => Array(9).fill(0));
         this.moveHistory = [];
         this.timer = {
             startTime: null,
@@ -23,7 +26,7 @@ class SudokuEngine {
     }
 
     isValidInRow(grid, row, num) {
-        if (row < 0 || row >= 9) return false;
+        if (row < 0 || row >= 9) { return false; }
         for (let col = 0; col < 9; col++) {
             if (grid[row][col] === num) {
                 return false;
@@ -33,7 +36,7 @@ class SudokuEngine {
     }
 
     isValidInColumn(grid, col, num) {
-        if (col < 0 || col >= 9) return false;
+        if (col < 0 || col >= 9) { return false; }
         for (let row = 0; row < 9; row++) {
             if (grid[row][col] === num) {
                 return false;
@@ -43,7 +46,7 @@ class SudokuEngine {
     }
 
     isValidInBox(grid, startRow, startCol, num) {
-        if (startRow < 0 || startRow >= 9 || startCol < 0 || startCol >= 9) return false;
+        if (startRow < 0 || startRow >= 9 || startCol < 0 || startCol >= 9) { return false; }
         for (let row = 0; row < 3; row++) {
             for (let col = 0; col < 3; col++) {
                 if (grid[startRow + row][startCol + col] === num) {
@@ -55,15 +58,15 @@ class SudokuEngine {
     }
 
     isValidPlacement(grid, row, col, num) {
-        if (num < 1 || num > 9) return false;
-        if (row < 0 || row >= 9 || col < 0 || col >= 9) return false;
-        
+        if (num < 1 || num > 9) { return false; }
+        if (row < 0 || row >= 9 || col < 0 || col >= 9) { return false; }
+
         const boxStartRow = Math.floor(row / 3) * 3;
         const boxStartCol = Math.floor(col / 3) * 3;
-        
-        return this.isValidInRow(grid, row, num) &&
-               this.isValidInColumn(grid, col, num) &&
-               this.isValidInBox(grid, boxStartRow, boxStartCol, num);
+
+        return this.isValidInRow(grid, row, num)
+               && this.isValidInColumn(grid, col, num)
+               && this.isValidInBox(grid, boxStartRow, boxStartCol, num);
     }
 
     isValidGrid(grid) {
@@ -101,29 +104,29 @@ class SudokuEngine {
         }
 
         const [row, col] = emptyCell;
-        
+
         for (let num = 1; num <= 9; num++) {
             if (this.isValidPlacement(grid, row, col, num)) {
                 grid[row][col] = num;
-                
+
                 if (this.solveSudoku(grid)) {
                     return true;
                 }
-                
+
                 grid[row][col] = 0;
             }
         }
-        
+
         return false;
     }
 
     hasUniqueSolution(grid) {
         const gridCopy = grid.map(row => [...row]);
         let solutions = 0;
-        
-        const countSolutions = (g) => {
-            if (solutions > 1) return;
-            
+
+        const countSolutions = g => {
+            if (solutions > 1) { return; }
+
             const emptyCell = this.findEmptyCell(g);
             if (!emptyCell) {
                 solutions++;
@@ -131,7 +134,7 @@ class SudokuEngine {
             }
 
             const [row, col] = emptyCell;
-            
+
             for (let num = 1; num <= 9; num++) {
                 if (this.isValidPlacement(g, row, col, num)) {
                     g[row][col] = num;
@@ -168,7 +171,7 @@ class SudokuEngine {
         const correctNumber = this.solution[row][col];
 
         this.gameState.hintsUsed++;
-        
+
         return {
             row,
             col,
@@ -191,7 +194,7 @@ class SudokuEngine {
         }
 
         const previousValue = this.grid[row][col];
-        
+
         this.moveHistory.push({
             row,
             col,
@@ -206,7 +209,7 @@ class SudokuEngine {
         if (num !== 0 && this.solution[row][col] !== num) {
             isCorrect = false;
             this.gameState.mistakes++;
-            
+
             if (this.gameState.mistakes >= this.gameState.maxMistakes) {
                 this.gameState.isFailed = true;
                 this.stopTimer();
@@ -224,7 +227,7 @@ class SudokuEngine {
             this.gameState.isCompleted = true;
             this.stopTimer();
             this.calculateFinalScore();
-            
+
             return {
                 success: true,
                 isCorrect,
@@ -250,10 +253,10 @@ class SudokuEngine {
         const lastMove = this.moveHistory.pop();
         this.grid[lastMove.row][lastMove.col] = lastMove.previousValue;
 
-        if (lastMove.newValue !== 0 && 
-            this.solution[lastMove.row][lastMove.col] !== lastMove.newValue) {
+        if (lastMove.newValue !== 0
+            && this.solution[lastMove.row][lastMove.col] !== lastMove.newValue) {
             this.gameState.mistakes = Math.max(0, this.gameState.mistakes - 1);
-            
+
             if (this.gameState.isFailed && this.gameState.mistakes < this.gameState.maxMistakes) {
                 this.gameState.isFailed = false;
             }
@@ -315,8 +318,8 @@ class SudokuEngine {
     }
 
     getElapsedTime() {
-        if (!this.timer.startTime) return 0;
-        
+        if (!this.timer.startTime) { return 0; }
+
         if (this.timer.isPaused) {
             return this.timer.pausedTime;
         } else if (this.timer.isRunning) {
@@ -342,7 +345,7 @@ class SudokuEngine {
         const baseScore = 1000;
         const elapsedTime = this.getElapsedTime();
         const timeInMinutes = elapsedTime / (1000 * 60);
-        
+
         const difficultyMultipliers = {
             easy: 1,
             medium: 1.5,
@@ -351,14 +354,14 @@ class SudokuEngine {
         };
 
         const difficultyMultiplier = difficultyMultipliers[this.gameState.difficulty] || 1;
-        
-        let timeBonus = Math.max(0, 500 - (timeInMinutes * 10));
+
+        const timeBonus = Math.max(0, 500 - (timeInMinutes * 10));
         const mistakePenalty = this.gameState.mistakes * 100;
         const hintPenalty = this.gameState.hintsUsed * 0.1;
 
         let finalScore = (baseScore + timeBonus - mistakePenalty) * difficultyMultiplier;
-        finalScore = finalScore * (1 - hintPenalty);
-        
+        finalScore *= (1 - hintPenalty);
+
         this.gameState.score = Math.max(0, Math.round(finalScore));
         return this.gameState.score;
     }
@@ -368,13 +371,13 @@ class SudokuEngine {
             throw new Error('Puzzle and solution are required');
         }
 
-        if (!Array.isArray(puzzle) || puzzle.length !== 9 || 
-            !puzzle.every(row => Array.isArray(row) && row.length === 9)) {
+        if (!Array.isArray(puzzle) || puzzle.length !== 9
+            || !puzzle.every(row => Array.isArray(row) && row.length === 9)) {
             throw new Error('Invalid puzzle format');
         }
 
-        if (!Array.isArray(solution) || solution.length !== 9 || 
-            !solution.every(row => Array.isArray(row) && row.length === 9)) {
+        if (!Array.isArray(solution) || solution.length !== 9
+            || !solution.every(row => Array.isArray(row) && row.length === 9)) {
             throw new Error('Invalid solution format');
         }
 
@@ -382,14 +385,14 @@ class SudokuEngine {
         this.originalGrid = puzzle.map(row => [...row]);
         this.solution = solution.map(row => [...row]);
         this.moveHistory = [];
-        
+
         this.timer = {
             startTime: null,
             pausedTime: 0,
             isRunning: false,
             isPaused: false
         };
-        
+
         this.gameState = {
             mistakes: 0,
             hintsUsed: 0,
@@ -397,7 +400,7 @@ class SudokuEngine {
             maxHints: 3,
             isCompleted: false,
             isFailed: false,
-            difficulty: difficulty,
+            difficulty,
             score: 0
         };
 
@@ -410,7 +413,7 @@ class SudokuEngine {
         }
 
         this.startTimer();
-        
+
         return {
             success: true,
             message: 'Game initialized successfully'
@@ -452,10 +455,10 @@ class SudokuEngine {
             this.moveHistory = [...savedState.moveHistory];
             this.timer = { ...savedState.timer };
             this.gameState = { ...savedState.gameState };
-            
+
             return { success: true, message: 'Game state restored successfully' };
         } catch (error) {
-            return { success: false, error: 'Failed to restore game state: ' + error.message };
+            return { success: false, error: `Failed to restore game state: ${error.message}` };
         }
     }
 }

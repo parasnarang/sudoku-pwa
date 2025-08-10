@@ -5,7 +5,7 @@ class PWAManager {
         this.isOnline = navigator.onLine;
         this.syncQueue = [];
         this.lastOnlineTime = Date.now();
-        
+
         this.initializePWA();
     }
 
@@ -15,7 +15,7 @@ class PWAManager {
         this.setupServiceWorkerMessaging();
         this.setupBackgroundSync();
         this.setupPushNotifications();
-        
+
         // Show install prompt after delay if not installed
         if (!this.isInstalled) {
             setTimeout(() => this.maybeShowInstallPrompt(), 30000); // 30 seconds
@@ -25,23 +25,23 @@ class PWAManager {
     // ====== INSTALL PROMPT ======
 
     setupInstallPrompt() {
-        window.addEventListener('beforeinstallprompt', (e) => {
+        window.addEventListener('beforeinstallprompt', e => {
             console.log('[PWA] Install prompt available');
             e.preventDefault();
             this.deferredPrompt = e;
-            
+
             // Update UI to show install option
             this.updateInstallButton(true);
         });
 
-        window.addEventListener('appinstalled', (e) => {
+        window.addEventListener('appinstalled', e => {
             console.log('[PWA] App installed successfully');
             this.isInstalled = true;
             this.deferredPrompt = null;
-            
+
             this.updateInstallButton(false);
             this.showInstallSuccessMessage();
-            
+
             // Track installation
             this.trackEvent('pwa_installed', {
                 method: 'prompt',
@@ -59,12 +59,12 @@ class PWAManager {
     updateInstallButton(show) {
         const installBtn = document.getElementById('install-app-btn');
         const installBanner = document.getElementById('install-banner');
-        
+
         if (installBtn) {
             installBtn.style.display = show ? 'flex' : 'none';
             installBtn.addEventListener('click', () => this.showInstallPrompt());
         }
-        
+
         if (installBanner) {
             installBanner.style.display = show ? 'block' : 'none';
         }
@@ -79,9 +79,9 @@ class PWAManager {
         try {
             const { outcome } = await this.deferredPrompt.prompt();
             console.log('[PWA] Install prompt result:', outcome);
-            
+
             this.trackEvent('install_prompt_result', { outcome });
-            
+
             if (outcome === 'accepted') {
                 this.deferredPrompt = null;
             }
@@ -92,19 +92,19 @@ class PWAManager {
     }
 
     maybeShowInstallPrompt() {
-        if (this.isInstalled || !this.deferredPrompt) return;
-        
+        if (this.isInstalled || !this.deferredPrompt) { return; }
+
         // Check if user has dismissed install prompt recently
         const lastDismissed = localStorage.getItem('pwa-install-dismissed');
         if (lastDismissed) {
             const daysSinceDismissed = (Date.now() - parseInt(lastDismissed)) / (1000 * 60 * 60 * 24);
-            if (daysSinceDismissed < 7) return; // Don't show for 7 days after dismissal
+            if (daysSinceDismissed < 7) { return; } // Don't show for 7 days after dismissal
         }
-        
+
         // Check engagement metrics
         const stats = window.userProgress?.getDisplayStats();
         const gamesPlayed = parseInt(stats?.gamesPlayed?.replace(/,/g, '') || '0');
-        
+
         if (gamesPlayed >= 3) { // Show after 3 games played
             this.showInstallBanner();
         }
@@ -113,7 +113,7 @@ class PWAManager {
     showInstallBanner() {
         const banner = this.createInstallBanner();
         document.body.appendChild(banner);
-        
+
         // Auto-hide after 10 seconds
         setTimeout(() => {
             if (banner.parentNode) {
@@ -143,7 +143,7 @@ class PWAManager {
                 </div>
             </div>
         `;
-        
+
         // Add styles
         banner.style.cssText = `
             position: fixed;
@@ -157,24 +157,24 @@ class PWAManager {
             animation: slideUp 0.3s ease-out;
             border: 1px solid #e0e0e0;
         `;
-        
+
         return banner;
     }
 
     dismissInstallPrompt() {
         localStorage.setItem('pwa-install-dismissed', Date.now().toString());
         const banner = document.getElementById('install-banner');
-        if (banner) banner.remove();
-        
+        if (banner) { banner.remove(); }
+
         this.trackEvent('install_prompt_dismissed');
     }
 
     showManualInstallInstructions() {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
         const isAndroid = /Android/.test(navigator.userAgent);
-        
+
         let instructions = '';
-        
+
         if (isIOS) {
             instructions = `
                 <h3>Install on iOS</h3>
@@ -203,7 +203,7 @@ class PWAManager {
                 </ol>
             `;
         }
-        
+
         this.showModal('Install App', instructions);
     }
 
@@ -212,7 +212,7 @@ class PWAManager {
     setupNetworkStatusTracking() {
         window.addEventListener('online', () => this.handleOnline());
         window.addEventListener('offline', () => this.handleOffline());
-        
+
         this.updateNetworkStatus();
         this.createNetworkStatusIndicator();
     }
@@ -221,11 +221,11 @@ class PWAManager {
         console.log('[PWA] Network: Online');
         this.isOnline = true;
         this.lastOnlineTime = Date.now();
-        
+
         this.updateNetworkStatus();
         this.processSyncQueue();
         this.showToast('Back online! Syncing data...', 'success');
-        
+
         // Trigger background sync
         this.scheduleBackgroundSync('sudoku-progress-sync');
     }
@@ -233,7 +233,7 @@ class PWAManager {
     handleOffline() {
         console.log('[PWA] Network: Offline');
         this.isOnline = false;
-        
+
         this.updateNetworkStatus();
         this.showToast('You\'re offline. Don\'t worry, you can still play!', 'info');
     }
@@ -241,13 +241,13 @@ class PWAManager {
     updateNetworkStatus() {
         const statusIndicator = document.getElementById('network-status');
         const connectionStatus = document.querySelector('.connection-status');
-        
+
         if (statusIndicator) {
             statusIndicator.classList.toggle('online', this.isOnline);
             statusIndicator.classList.toggle('offline', !this.isOnline);
             statusIndicator.title = this.isOnline ? 'Online' : 'Offline';
         }
-        
+
         if (connectionStatus) {
             if (this.isOnline) {
                 connectionStatus.style.display = 'none';
@@ -257,14 +257,14 @@ class PWAManager {
                 connectionStatus.style.display = 'block';
             }
         }
-        
+
         // Update page visibility indicator
         document.documentElement.setAttribute('data-connection', this.isOnline ? 'online' : 'offline');
     }
 
     createNetworkStatusIndicator() {
-        if (document.getElementById('network-status')) return;
-        
+        if (document.getElementById('network-status')) { return; }
+
         const indicator = document.createElement('div');
         indicator.id = 'network-status';
         indicator.className = 'network-status';
@@ -272,7 +272,7 @@ class PWAManager {
             <div class="network-dot"></div>
             <span class="network-text">Online</span>
         `;
-        
+
         indicator.style.cssText = `
             position: fixed;
             top: 10px;
@@ -288,7 +288,7 @@ class PWAManager {
             z-index: 1000;
             transition: all 0.3s ease;
         `;
-        
+
         // Add dot styles
         const style = document.createElement('style');
         style.textContent = `
@@ -307,7 +307,7 @@ class PWAManager {
             }
         `;
         document.head.appendChild(style);
-        
+
         document.body.appendChild(indicator);
     }
 
@@ -328,17 +328,16 @@ class PWAManager {
             this.addToSyncQueue(tag, data);
         }
 
-        navigator.serviceWorker.ready.then(registration => {
-            return registration.sync.register(tag);
-        }).then(() => {
+        navigator.serviceWorker.ready.then(registration => registration.sync.register(tag)).then(() => {
             console.log('[PWA] Background sync scheduled:', tag);
-        }).catch(error => {
-            console.error('[PWA] Background sync failed:', error);
-            // Fallback: try to sync immediately if online
-            if (this.isOnline) {
-                this.processSyncQueue();
-            }
-        });
+        })
+            .catch(error => {
+                console.error('[PWA] Background sync failed:', error);
+                // Fallback: try to sync immediately if online
+                if (this.isOnline) {
+                    this.processSyncQueue();
+                }
+            });
     }
 
     addToSyncQueue(tag, data) {
@@ -351,12 +350,12 @@ class PWAManager {
     }
 
     async processSyncQueue() {
-        if (!this.isOnline || this.syncQueue.length === 0) return;
-        
+        if (!this.isOnline || this.syncQueue.length === 0) { return; }
+
         console.log('[PWA] Processing sync queue:', this.syncQueue.length, 'items');
-        
+
         const processedItems = [];
-        
+
         for (const item of this.syncQueue) {
             try {
                 const success = await this.syncData(item.tag, item.data);
@@ -367,11 +366,11 @@ class PWAManager {
                 console.error('[PWA] Sync failed for item:', item.tag, error);
             }
         }
-        
+
         // Remove successfully synced items
         this.syncQueue = this.syncQueue.filter(item => !processedItems.includes(item));
         this.saveSyncQueue();
-        
+
         if (processedItems.length > 0) {
             this.showToast(`Synced ${processedItems.length} items`, 'success');
         }
@@ -380,10 +379,10 @@ class PWAManager {
     async syncData(tag, data) {
         // Mock sync - in real implementation, this would sync with server
         console.log('[PWA] Syncing data:', tag, data);
-        
+
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         return true; // Success
     }
 
@@ -408,11 +407,11 @@ class PWAManager {
     // ====== SERVICE WORKER MESSAGING ======
 
     setupServiceWorkerMessaging() {
-        if (!('serviceWorker' in navigator)) return;
-        
-        navigator.serviceWorker.addEventListener('message', (event) => {
+        if (!('serviceWorker' in navigator)) { return; }
+
+        navigator.serviceWorker.addEventListener('message', event => {
             const { type, data } = event.data;
-            
+
             switch (type) {
                 case 'SYNC_SUCCESS':
                     this.handleSyncSuccess(data);
@@ -430,8 +429,8 @@ class PWAManager {
     }
 
     sendMessageToSW(type, data = null) {
-        if (!('serviceWorker' in navigator)) return;
-        
+        if (!('serviceWorker' in navigator)) { return; }
+
         navigator.serviceWorker.ready.then(registration => {
             if (registration.active) {
                 registration.active.postMessage({ type, data });
@@ -468,9 +467,9 @@ class PWAManager {
         if (window.settingsManager?.get('notifications.dailyReminder')) {
             await this.requestNotificationPermission();
         }
-        
+
         // Listen for settings changes
-        window.addEventListener('settingsChanged', (event) => {
+        window.addEventListener('settingsChanged', event => {
             if (event.detail.path === 'notifications.dailyReminder') {
                 if (event.detail.newValue) {
                     this.requestNotificationPermission();
@@ -485,12 +484,12 @@ class PWAManager {
         try {
             const permission = await Notification.requestPermission();
             console.log('[PWA] Notification permission:', permission);
-            
+
             if (permission === 'granted') {
                 await this.subscribeToPushNotifications();
                 this.scheduleDailyReminder();
             }
-            
+
             return permission;
         } catch (error) {
             console.error('[PWA] Notification permission request failed:', error);
@@ -501,25 +500,25 @@ class PWAManager {
     async subscribeToPushNotifications() {
         try {
             const registration = await navigator.serviceWorker.ready;
-            
+
             // Check if already subscribed
             const existingSubscription = await registration.pushManager.getSubscription();
             if (existingSubscription) {
                 console.log('[PWA] Already subscribed to push notifications');
                 return existingSubscription;
             }
-            
+
             // Subscribe to push notifications
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
                 applicationServerKey: this.urlBase64ToUint8Array('your-vapid-public-key-here')
             });
-            
+
             console.log('[PWA] Subscribed to push notifications');
-            
+
             // Send subscription to server (in real implementation)
             // await this.sendSubscriptionToServer(subscription);
-            
+
             return subscription;
         } catch (error) {
             console.error('[PWA] Push subscription failed:', error);
@@ -531,11 +530,11 @@ class PWAManager {
         try {
             const registration = await navigator.serviceWorker.ready;
             const subscription = await registration.pushManager.getSubscription();
-            
+
             if (subscription) {
                 await subscription.unsubscribe();
                 console.log('[PWA] Unsubscribed from push notifications');
-                
+
                 // Remove from server (in real implementation)
                 // await this.removeSubscriptionFromServer(subscription);
             }
@@ -547,24 +546,24 @@ class PWAManager {
     scheduleDailyReminder() {
         const reminderTime = window.settingsManager?.get('notifications.reminderTime') || '18:00';
         const [hours, minutes] = reminderTime.split(':').map(n => parseInt(n));
-        
+
         const now = new Date();
         const reminderDate = new Date(now);
         reminderDate.setHours(hours, minutes, 0, 0);
-        
+
         // If the time has passed today, schedule for tomorrow
         if (reminderDate <= now) {
             reminderDate.setDate(reminderDate.getDate() + 1);
         }
-        
+
         const delay = reminderDate.getTime() - now.getTime();
-        
+
         setTimeout(() => {
             this.showDailyReminder();
             // Schedule next reminder
             setTimeout(() => this.scheduleDailyReminder(), 24 * 60 * 60 * 1000);
         }, delay);
-        
+
         console.log('[PWA] Daily reminder scheduled for:', reminderDate.toLocaleString());
     }
 
@@ -583,9 +582,9 @@ class PWAManager {
 
     checkIfInstalled() {
         // Check for various install indicators
-        return window.matchMedia('(display-mode: standalone)').matches ||
-               window.navigator.standalone === true ||
-               document.referrer.includes('android-app://');
+        return window.matchMedia('(display-mode: standalone)').matches
+               || window.navigator.standalone === true
+               || document.referrer.includes('android-app://');
     }
 
     isIOSStandalone() {
@@ -597,10 +596,10 @@ class PWAManager {
         const base64 = (base64String + padding)
             .replace(/-/g, '+')
             .replace(/_/g, '/');
-        
+
         const rawData = window.atob(base64);
         const outputArray = new Uint8Array(rawData.length);
-        
+
         for (let i = 0; i < rawData.length; ++i) {
             outputArray[i] = rawData.charCodeAt(i);
         }
@@ -610,7 +609,7 @@ class PWAManager {
     trackEvent(eventName, data = {}) {
         // Analytics tracking - implement based on your analytics provider
         console.log('[PWA] Event:', eventName, data);
-        
+
         // Example: Send to analytics service
         // gtag('event', eventName, data);
     }
@@ -619,14 +618,14 @@ class PWAManager {
         const toast = document.createElement('div');
         toast.className = `pwa-toast ${type}`;
         toast.textContent = message;
-        
+
         const colors = {
             success: '#4caf50',
             error: '#f44336',
             info: '#2196f3',
             warning: '#ff9800'
         };
-        
+
         toast.style.cssText = `
             position: fixed;
             bottom: 20px;
@@ -643,9 +642,9 @@ class PWAManager {
             text-align: center;
             animation: slideUp 0.3s ease-out;
         `;
-        
+
         document.body.appendChild(toast);
-        
+
         setTimeout(() => {
             toast.style.animation = 'slideDown 0.3s ease-in forwards';
             setTimeout(() => toast.remove(), 300);
@@ -675,7 +674,7 @@ class PWAManager {
                 </div>
             </div>
         `;
-        
+
         // Add styles
         modal.style.cssText = `
             position: fixed;
@@ -688,25 +687,25 @@ class PWAManager {
             align-items: center;
             justify-content: center;
         `;
-        
+
         // Handle actions
-        modal.addEventListener('click', (e) => {
-            const action = e.target.dataset.action;
+        modal.addEventListener('click', e => {
+            const { action } = e.target.dataset;
             if (action === 'close' || e.target.classList.contains('pwa-modal-backdrop') || e.target.classList.contains('pwa-modal-close')) {
                 modal.remove();
             }
         });
-        
+
         document.body.appendChild(modal);
         return modal;
     }
 
     // Public API methods
-    
+
     async installApp() {
         return this.showInstallPrompt();
     }
-    
+
     getInstallStatus() {
         return {
             isInstalled: this.isInstalled,
@@ -714,7 +713,7 @@ class PWAManager {
             hasPrompt: !!this.deferredPrompt
         };
     }
-    
+
     getNetworkStatus() {
         return {
             isOnline: this.isOnline,
@@ -722,7 +721,7 @@ class PWAManager {
             syncQueueSize: this.syncQueue.length
         };
     }
-    
+
     clearCache(cacheName = null) {
         if (cacheName) {
             this.sendMessageToSW('CLEAR_CACHE', { cacheName });
@@ -731,10 +730,10 @@ class PWAManager {
             this.sendMessageToSW('CLEAR_CACHE', { cacheName: 'all' });
         }
     }
-    
+
     async checkForUpdates() {
-        if (!('serviceWorker' in navigator)) return false;
-        
+        if (!('serviceWorker' in navigator)) { return false; }
+
         try {
             const registration = await navigator.serviceWorker.ready;
             await registration.update();

@@ -5,7 +5,7 @@ class DataStorage {
         this.maxCacheAge = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
         this.autoSaveInterval = 30000; // 30 seconds
         this.maxStorageItems = 100;
-        
+
         this.storageKeys = {
             gameState: `${this.prefix}-current-game`,
             userStats: `${this.prefix}-user-stats`,
@@ -22,7 +22,7 @@ class DataStorage {
         this.isInitialized = false;
         this.autoSaveTimer = null;
         this.compressionSupported = false;
-        
+
         this.initializeStorage();
     }
 
@@ -30,19 +30,18 @@ class DataStorage {
         try {
             // Check if compression is supported
             this.compressionSupported = 'CompressionStream' in window;
-            
+
             // Run version migration if needed
             await this.migrateData();
-            
+
             // Initialize metadata
             await this.initializeMetadata();
-            
+
             // Start periodic cleanup
             this.startPeriodicCleanup();
-            
+
             this.isInitialized = true;
             console.log('Data storage initialized successfully');
-            
         } catch (error) {
             console.error('Storage initialization failed:', error);
             this.isInitialized = false;
@@ -56,17 +55,17 @@ class DataStorage {
             const gameState = {
                 version: this.version,
                 timestamp: Date.now(),
-                gameData: gameData,
-                puzzleData: puzzleData,
+                gameData,
+                puzzleData,
                 sessionId: this.generateSessionId(),
                 checksum: this.generateChecksum(gameData)
             };
 
             const compressed = await this.compressData(gameState);
             localStorage.setItem(this.storageKeys.gameState, compressed);
-            
+
             this.updateMetadata('lastGameSave', Date.now());
-            
+
             return { success: true };
         } catch (error) {
             console.error('Failed to save game state:', error);
@@ -77,15 +76,15 @@ class DataStorage {
     async loadGameState() {
         try {
             const stored = localStorage.getItem(this.storageKeys.gameState);
-            if (!stored) return { success: false, error: 'No saved game found' };
+            if (!stored) { return { success: false, error: 'No saved game found' }; }
 
             const gameState = await this.decompressData(stored);
-            
+
             // Validate checksum
             if (!this.validateChecksum(gameState.gameData, gameState.checksum)) {
                 console.warn('Game state checksum validation failed');
             }
-            
+
             // Check if game state is too old (7 days)
             const age = Date.now() - gameState.timestamp;
             if (age > 7 * 24 * 60 * 60 * 1000) {
@@ -129,9 +128,9 @@ class DataStorage {
 
             const compressed = await this.compressData(userProgress);
             localStorage.setItem(this.storageKeys.userStats, compressed);
-            
+
             this.updateMetadata('lastProgressSave', Date.now());
-            
+
             return { success: true };
         } catch (error) {
             console.error('Failed to save user progress:', error);
@@ -142,10 +141,10 @@ class DataStorage {
     async loadUserProgress() {
         try {
             const stored = localStorage.getItem(this.storageKeys.userStats);
-            if (!stored) return { success: false, error: 'No user progress found' };
+            if (!stored) { return { success: false, error: 'No user progress found' }; }
 
             const userProgress = await this.decompressData(stored);
-            
+
             // Validate checksum
             if (!this.validateChecksum(userProgress.data, userProgress.checksum)) {
                 console.warn('User progress checksum validation failed');
@@ -174,7 +173,7 @@ class DataStorage {
 
             localStorage.setItem(this.storageKeys.settings, JSON.stringify(settingsData));
             this.updateMetadata('lastSettingsSave', Date.now());
-            
+
             return { success: true };
         } catch (error) {
             console.error('Failed to save settings:', error);
@@ -185,10 +184,10 @@ class DataStorage {
     loadSettings() {
         try {
             const stored = localStorage.getItem(this.storageKeys.settings);
-            if (!stored) return { success: false, error: 'No settings found' };
+            if (!stored) { return { success: false, error: 'No settings found' }; }
 
             const settingsData = JSON.parse(stored);
-            
+
             return {
                 success: true,
                 data: settingsData.data,
@@ -208,7 +207,7 @@ class DataStorage {
             const cacheData = {
                 date: dateKey,
                 timestamp: Date.now(),
-                puzzleData: puzzleData,
+                puzzleData,
                 checksum: this.generateChecksum(puzzleData)
             };
 
@@ -227,9 +226,9 @@ class DataStorage {
             // Save updated cache
             const compressed = await this.compressData(cache.data);
             localStorage.setItem(this.storageKeys.dailyCache, compressed);
-            
+
             this.updateMetadata('lastCacheUpdate', Date.now());
-            
+
             return { success: true };
         } catch (error) {
             console.error('Failed to cache daily puzzle:', error);
@@ -241,13 +240,13 @@ class DataStorage {
         try {
             const dateKey = this.formatDateKey(date);
             const cache = await this.loadDailyCache();
-            
+
             if (!cache.success || !cache.data[dateKey]) {
                 return { success: false, error: 'Puzzle not cached' };
             }
 
             const cachedPuzzle = cache.data[dateKey];
-            
+
             // Check if cache is too old
             const age = Date.now() - cachedPuzzle.timestamp;
             if (age > this.maxCacheAge) {
@@ -276,7 +275,7 @@ class DataStorage {
     async loadDailyCache() {
         try {
             const stored = localStorage.getItem(this.storageKeys.dailyCache);
-            if (!stored) return { success: false, error: 'No cache found' };
+            if (!stored) { return { success: false, error: 'No cache found' }; }
 
             const cacheData = await this.decompressData(stored);
             return { success: true, data: cacheData };
@@ -314,16 +313,16 @@ class DataStorage {
             const achievements = this.loadAchievements();
             const tournamentProgress = this.loadTournamentProgress();
 
-            if (gameState.success) backupData.data.gameState = gameState;
-            if (userProgress.success) backupData.data.userProgress = userProgress;
-            if (settings.success) backupData.data.settings = settings;
-            if (achievements.success) backupData.data.achievements = achievements;
-            if (tournamentProgress.success) backupData.data.tournamentProgress = tournamentProgress;
+            if (gameState.success) { backupData.data.gameState = gameState; }
+            if (userProgress.success) { backupData.data.userProgress = userProgress; }
+            if (settings.success) { backupData.data.settings = settings; }
+            if (achievements.success) { backupData.data.achievements = achievements; }
+            if (tournamentProgress.success) { backupData.data.tournamentProgress = tournamentProgress; }
 
             // Create backup
             const compressed = await this.compressData(backupData);
             const backupBlob = new Blob([compressed], { type: 'application/json' });
-            
+
             // Save to localStorage as well
             localStorage.setItem(this.storageKeys.backup, compressed);
             this.updateMetadata('lastBackup', Date.now());
@@ -343,7 +342,7 @@ class DataStorage {
     async restoreFromBackup(backupData) {
         try {
             let parsedData;
-            
+
             if (typeof backupData === 'string') {
                 parsedData = await this.decompressData(backupData);
             } else if (backupData instanceof Blob) {
@@ -388,7 +387,7 @@ class DataStorage {
 
             return {
                 success: true,
-                results: results,
+                results,
                 backupVersion: parsedData.version,
                 backupTimestamp: parsedData.timestamp
             };
@@ -417,7 +416,7 @@ class DataStorage {
                 return {
                     supported: false,
                     quota: 10 * 1024 * 1024, // Assume 10MB limit
-                    usage: usage,
+                    usage,
                     available: (10 * 1024 * 1024) - usage,
                     usageDetails: { localStorage: usage }
                 };
@@ -488,7 +487,7 @@ class DataStorage {
 
             this.updateMetadata('lastCleanup', Date.now());
 
-            return { success: true, cleaned: cleaned };
+            return { success: true, cleaned };
         } catch (error) {
             console.error('Storage cleanup failed:', error);
             return { success: false, error: error.message };
@@ -502,12 +501,12 @@ class DataStorage {
             clearInterval(this.autoSaveTimer);
         }
 
-        this.autoSaveTimer = setInterval(async () => {
+        this.autoSaveTimer = setInterval(async() => {
             if (gameUI?.engine && !gameUI.engine.gameState.isCompleted && !gameUI.engine.gameState.isFailed) {
                 try {
                     const gameData = gameUI.engine.exportGameState();
                     await this.saveGameState(gameData, gameUI.currentPuzzle);
-                    
+
                     // Dispatch auto-save event
                     window.dispatchEvent(new CustomEvent('autoSaveCompleted', {
                         detail: { timestamp: Date.now() }
@@ -539,19 +538,20 @@ class DataStorage {
     cleanOldCacheEntries(cacheData) {
         const now = Date.now();
         const cleaned = {};
-        
+
         Object.entries(cacheData).forEach(([key, entry]) => {
             const age = now - entry.timestamp;
             if (age <= this.maxCacheAge) {
                 cleaned[key] = entry;
             }
         });
-        
+
         return cleaned;
     }
 
     generateSessionId() {
-        return Math.random().toString(36).substring(2) + Date.now().toString(36);
+        return Math.random().toString(36)
+            .substring(2) + Date.now().toString(36);
     }
 
     generateChecksum(data) {
@@ -560,7 +560,7 @@ class DataStorage {
         for (let i = 0; i < str.length; i++) {
             const char = str.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
+            hash &= hash; // Convert to 32-bit integer
         }
         return hash.toString(36);
     }
@@ -572,7 +572,7 @@ class DataStorage {
     async compressData(data) {
         try {
             const jsonString = JSON.stringify(data);
-            
+
             if (!this.compressionSupported) {
                 return jsonString;
             }
@@ -676,7 +676,7 @@ class DataStorage {
     loadAchievements() {
         try {
             const stored = localStorage.getItem(this.storageKeys.achievements);
-            if (!stored) return { success: false, error: 'No achievements found' };
+            if (!stored) { return { success: false, error: 'No achievements found' }; }
 
             const data = JSON.parse(stored);
             return { success: true, data: data.data, timestamp: data.timestamp };
@@ -705,7 +705,7 @@ class DataStorage {
     loadTournamentProgress() {
         try {
             const stored = localStorage.getItem(this.storageKeys.tournamentProgress);
-            if (!stored) return { success: false, error: 'No tournament progress found' };
+            if (!stored) { return { success: false, error: 'No tournament progress found' }; }
 
             const data = JSON.parse(stored);
             return { success: true, data: data.data, timestamp: data.timestamp };
@@ -732,10 +732,10 @@ class DataStorage {
         try {
             const stored = localStorage.getItem(this.storageKeys.metadata);
             const metadata = stored ? JSON.parse(stored) : {};
-            
+
             metadata[key] = value;
             metadata.lastUpdate = Date.now();
-            
+
             localStorage.setItem(this.storageKeys.metadata, JSON.stringify(metadata));
         } catch (error) {
             console.error('Failed to update metadata:', error);
@@ -745,14 +745,14 @@ class DataStorage {
     async migrateData() {
         try {
             const storedVersion = localStorage.getItem(this.storageKeys.version);
-            
+
             if (!storedVersion || storedVersion !== this.version) {
                 console.log(`Migrating data from ${storedVersion || 'unknown'} to ${this.version}`);
-                
+
                 // Perform any necessary data migrations here
                 // For now, just update the version
                 localStorage.setItem(this.storageKeys.version, this.version);
-                
+
                 this.updateMetadata('lastMigration', Date.now());
                 this.updateMetadata('migratedFrom', storedVersion || 'unknown');
             }
@@ -763,9 +763,9 @@ class DataStorage {
 
     startPeriodicCleanup() {
         // Run cleanup every 24 hours
-        setInterval(async () => {
+        setInterval(async() => {
             const quota = await this.getStorageQuota();
-            
+
             // If usage is over 80% of quota, run cleanup
             if (quota.usage / quota.quota > 0.8) {
                 console.log('Storage usage high, running cleanup...');
@@ -782,12 +782,12 @@ class DataStorage {
     async getStorageInfo() {
         const quota = await this.getStorageQuota();
         const metadata = JSON.parse(localStorage.getItem(this.storageKeys.metadata) || '{}');
-        
+
         const info = {
             version: this.version,
             initialized: this.isInitialized,
-            quota: quota,
-            metadata: metadata,
+            quota,
+            metadata,
             keys: Object.keys(localStorage).filter(key => key.startsWith(this.prefix))
         };
 
@@ -817,12 +817,12 @@ class DataStorage {
         try {
             const keys = Object.keys(localStorage).filter(key => key.startsWith(this.prefix));
             keys.forEach(key => localStorage.removeItem(key));
-            
+
             this.stopAutoSave();
-            
+
             // Reinitialize
             await this.initializeStorage();
-            
+
             return { success: true, clearedKeys: keys.length };
         } catch (error) {
             console.error('Failed to clear all data:', error);

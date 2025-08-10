@@ -6,7 +6,7 @@ class AccessibilityManager {
         this.announcementQueue = [];
         this.currentFocus = null;
         this.keyboardShortcuts = new Map();
-        
+
         this.initializeAccessibility();
     }
 
@@ -25,13 +25,13 @@ class AccessibilityManager {
         // Detect common screen readers
         const userAgent = navigator.userAgent.toLowerCase();
         return (
-            window.speechSynthesis ||
-            userAgent.includes('nvda') ||
-            userAgent.includes('jaws') ||
-            userAgent.includes('dragon') ||
-            userAgent.includes('voiceover') ||
-            navigator.userAgent.includes('NVDA') ||
-            navigator.userAgent.includes('JAWS')
+            window.speechSynthesis
+            || userAgent.includes('nvda')
+            || userAgent.includes('jaws')
+            || userAgent.includes('dragon')
+            || userAgent.includes('voiceover')
+            || navigator.userAgent.includes('NVDA')
+            || navigator.userAgent.includes('JAWS')
         );
     }
 
@@ -56,25 +56,25 @@ class AccessibilityManager {
 
         // Setup page titles
         this.updatePageTitle();
-        
+
         // Setup game grid ARIA
         this.setupGameGridARIA();
-        
+
         // Setup modal ARIA
         this.setupModalARIA();
-        
+
         // Setup form ARIA
         this.setupFormARIA();
     }
 
     setupGameGridARIA() {
         const gameGrid = document.getElementById('sudoku-grid');
-        if (!gameGrid) return;
+        if (!gameGrid) { return; }
 
         gameGrid.setAttribute('role', 'grid');
         gameGrid.setAttribute('aria-label', 'Sudoku puzzle grid');
         gameGrid.setAttribute('aria-describedby', 'sudoku-instructions');
-        
+
         // Add instructions
         const instructions = document.createElement('div');
         instructions.id = 'sudoku-instructions';
@@ -91,12 +91,12 @@ class AccessibilityManager {
         cells.forEach((cell, index) => {
             const row = Math.floor(index / 9) + 1;
             const col = (index % 9) + 1;
-            
+
             cell.setAttribute('role', 'gridcell');
             cell.setAttribute('tabindex', index === 0 ? '0' : '-1');
             cell.setAttribute('aria-label', `Row ${row}, Column ${col}`);
             cell.setAttribute('aria-describedby', 'sudoku-instructions');
-            
+
             // Update cell content description
             this.updateCellDescription(cell, index);
         });
@@ -108,23 +108,23 @@ class AccessibilityManager {
         const value = cell.textContent.trim();
         const isOriginal = cell.classList.contains('original');
         const isSelected = cell.classList.contains('selected');
-        
+
         let description = `Row ${row}, Column ${col}`;
-        
+
         if (value) {
             description += `, ${isOriginal ? 'given' : 'entered'} number ${value}`;
         } else {
             description += ', empty cell';
         }
-        
+
         if (isSelected) {
             description += ', selected';
         }
-        
+
         if (cell.classList.contains('error')) {
             description += ', invalid entry';
         }
-        
+
         if (cell.classList.contains('hint')) {
             description += ', hint provided';
         }
@@ -137,14 +137,14 @@ class AccessibilityManager {
         modals.forEach(modal => {
             modal.setAttribute('role', 'dialog');
             modal.setAttribute('aria-modal', 'true');
-            
+
             const title = modal.querySelector('h2, h3, .modal-title');
             if (title) {
                 const titleId = title.id || `modal-title-${Date.now()}`;
                 title.id = titleId;
                 modal.setAttribute('aria-labelledby', titleId);
             }
-            
+
             const content = modal.querySelector('.modal-body, .modal-content');
             if (content) {
                 const contentId = content.id || `modal-content-${Date.now()}`;
@@ -158,20 +158,20 @@ class AccessibilityManager {
         // Associate labels with form controls
         const formControls = document.querySelectorAll('input, select, textarea');
         formControls.forEach(control => {
-            const label = document.querySelector(`label[for="${control.id}"]`) || 
-                          control.closest('.setting-item')?.querySelector('label');
-            
+            const label = document.querySelector(`label[for="${control.id}"]`)
+                          || control.closest('.setting-item')?.querySelector('label');
+
             if (label && !control.getAttribute('aria-labelledby')) {
                 const labelId = label.id || `label-${Date.now()}`;
                 label.id = labelId;
                 control.setAttribute('aria-labelledby', labelId);
             }
-            
+
             // Add required indicators
             if (control.required) {
                 control.setAttribute('aria-required', 'true');
             }
-            
+
             // Add invalid state
             if (control.classList.contains('error') || control.getAttribute('aria-invalid')) {
                 control.setAttribute('aria-invalid', 'true');
@@ -183,7 +183,7 @@ class AccessibilityManager {
         toggles.forEach(toggle => {
             toggle.setAttribute('role', 'switch');
             toggle.setAttribute('aria-checked', toggle.checked);
-            
+
             toggle.addEventListener('change', () => {
                 toggle.setAttribute('aria-checked', toggle.checked);
                 this.announce(`${toggle.getAttribute('aria-label') || 'Setting'} ${toggle.checked ? 'enabled' : 'disabled'}`);
@@ -194,33 +194,33 @@ class AccessibilityManager {
     setupKeyboardNavigation() {
         // Grid navigation
         this.setupGridKeyboardNavigation();
-        
+
         // Tab navigation
         this.setupTabNavigation();
-        
+
         // Modal navigation
         this.setupModalKeyboardNavigation();
-        
+
         // General keyboard shortcuts
-        document.addEventListener('keydown', (e) => this.handleGlobalKeyboard(e));
+        document.addEventListener('keydown', e => this.handleGlobalKeyboard(e));
     }
 
     setupGridKeyboardNavigation() {
         const gameGrid = document.getElementById('sudoku-grid');
-        if (!gameGrid) return;
+        if (!gameGrid) { return; }
 
-        gameGrid.addEventListener('keydown', (e) => {
-            if (!gameGrid.contains(document.activeElement)) return;
-            
+        gameGrid.addEventListener('keydown', e => {
+            if (!gameGrid.contains(document.activeElement)) { return; }
+
             const currentCell = document.activeElement;
             const currentIndex = Array.from(gameGrid.children).indexOf(currentCell);
-            
-            if (currentIndex === -1) return;
-            
+
+            if (currentIndex === -1) { return; }
+
             const row = Math.floor(currentIndex / 9);
             const col = currentIndex % 9;
             let newIndex = currentIndex;
-            
+
             switch (e.key) {
                 case 'ArrowUp':
                     e.preventDefault();
@@ -255,7 +255,7 @@ class AccessibilityManager {
                     newIndex = 72 + col; // Last cell in column
                     break;
             }
-            
+
             if (newIndex !== currentIndex) {
                 this.focusCell(newIndex);
                 this.announceGridPosition(newIndex);
@@ -265,7 +265,7 @@ class AccessibilityManager {
 
     setupTabNavigation() {
         // Enhanced tab navigation for better UX
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
             if (e.key === 'Tab') {
                 this.handleTabNavigation(e);
             }
@@ -273,15 +273,15 @@ class AccessibilityManager {
     }
 
     setupModalKeyboardNavigation() {
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', e => {
             const activeModal = document.querySelector('[role="dialog"]:not(.hidden)');
-            if (!activeModal) return;
-            
+            if (!activeModal) { return; }
+
             if (e.key === 'Escape') {
                 e.preventDefault();
                 this.closeModal(activeModal);
             }
-            
+
             // Trap focus within modal
             if (e.key === 'Tab') {
                 this.trapFocus(activeModal, e);
@@ -308,7 +308,7 @@ class AccessibilityManager {
         this.addKeyboardShortcut('n', () => {
             if (window.gameUI) {
                 window.gameUI.toggleNotesMode();
-                const notesMode = window.gameUI.notesMode;
+                const { notesMode } = window.gameUI;
                 this.announce(`Notes mode ${notesMode ? 'enabled' : 'disabled'}`);
             }
         }, 'Toggle notes mode');
@@ -354,7 +354,7 @@ class AccessibilityManager {
     handleGlobalKeyboard(e) {
         const key = this.getKeyString(e);
         const shortcut = this.keyboardShortcuts.get(key);
-        
+
         if (shortcut) {
             e.preventDefault();
             shortcut.callback();
@@ -363,21 +363,21 @@ class AccessibilityManager {
 
     getKeyString(e) {
         const parts = [];
-        if (e.ctrlKey) parts.push('Ctrl');
-        if (e.altKey) parts.push('Alt');
-        if (e.shiftKey) parts.push('Shift');
+        if (e.ctrlKey) { parts.push('Ctrl'); }
+        if (e.altKey) { parts.push('Alt'); }
+        if (e.shiftKey) { parts.push('Shift'); }
         parts.push(e.key);
         return parts.join('+');
     }
 
     setupFocusManagement() {
         // Track focus changes
-        document.addEventListener('focusin', (e) => {
+        document.addEventListener('focusin', e => {
             this.currentFocus = e.target;
         });
 
         // Handle focus restoration
-        document.addEventListener('focusout', (e) => {
+        document.addEventListener('focusout', e => {
             // Restore focus if it leaves the document
             setTimeout(() => {
                 if (!document.activeElement || document.activeElement === document.body) {
@@ -390,7 +390,7 @@ class AccessibilityManager {
     setupScreenReaderSupport() {
         // Create live regions for announcements
         this.createLiveRegions();
-        
+
         // Enhanced screen reader support
         if (this.screenReaderEnabled) {
             this.enableScreenReaderFeatures();
@@ -440,15 +440,15 @@ class AccessibilityManager {
             z-index: 9999;
             transition: top 0.3s;
         `;
-        
+
         skipNav.addEventListener('focus', () => {
             skipNav.style.top = '6px';
         });
-        
+
         skipNav.addEventListener('blur', () => {
             skipNav.style.top = '-40px';
         });
-        
+
         document.body.insertBefore(skipNav, document.body.firstChild);
 
         // Skip to game grid
@@ -458,15 +458,15 @@ class AccessibilityManager {
         skipToGame.className = 'skip-link';
         skipToGame.style.cssText = skipNav.style.cssText;
         skipToGame.style.left = '150px';
-        
+
         skipToGame.addEventListener('focus', () => {
             skipToGame.style.top = '6px';
         });
-        
+
         skipToGame.addEventListener('blur', () => {
             skipToGame.style.top = '-40px';
         });
-        
+
         document.body.insertBefore(skipToGame, skipNav.nextSibling);
     }
 
@@ -479,7 +479,7 @@ class AccessibilityManager {
             cells.forEach(cell => cell.setAttribute('tabindex', '-1'));
             cells[index].setAttribute('tabindex', '0');
             cells[index].focus();
-            
+
             // Update cell descriptions
             this.updateCellDescription(cells[index], index);
         }
@@ -500,20 +500,18 @@ class AccessibilityManager {
         const focusableElements = container.querySelectorAll(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
-        
+
         const firstFocusable = focusableElements[0];
         const lastFocusable = focusableElements[focusableElements.length - 1];
-        
+
         if (event.shiftKey) {
             if (document.activeElement === firstFocusable) {
                 event.preventDefault();
                 lastFocusable.focus();
             }
-        } else {
-            if (document.activeElement === lastFocusable) {
-                event.preventDefault();
-                firstFocusable.focus();
-            }
+        } else if (document.activeElement === lastFocusable) {
+            event.preventDefault();
+            firstFocusable.focus();
         }
     }
 
@@ -522,10 +520,10 @@ class AccessibilityManager {
     announce(message, priority = 'polite') {
         const regionId = priority === 'assertive' ? 'aria-live-assertive' : 'aria-live-polite';
         const region = document.getElementById(regionId);
-        
+
         if (region) {
             region.textContent = message;
-            
+
             // Clear after a short delay to allow for new announcements
             setTimeout(() => {
                 region.textContent = '';
@@ -545,14 +543,14 @@ class AccessibilityManager {
         const col = (index % 9) + 1;
         const cell = document.querySelectorAll('.sudoku-cell')[index];
         const value = cell?.textContent.trim();
-        
+
         let message = `Row ${row}, Column ${col}`;
         if (value) {
             message += `, contains ${value}`;
         } else {
             message += `, empty`;
         }
-        
+
         this.announceStatus(message);
     }
 
@@ -620,13 +618,13 @@ class AccessibilityManager {
         const shortcuts = Array.from(this.keyboardShortcuts.entries())
             .map(([key, { description }]) => `${key}: ${description}`)
             .join('\n');
-        
+
         const modal = document.createElement('div');
         modal.className = 'accessibility-modal';
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
         modal.setAttribute('aria-labelledby', 'shortcuts-title');
-        
+
         modal.innerHTML = `
             <div class="modal-backdrop"></div>
             <div class="modal-content">
@@ -639,7 +637,7 @@ class AccessibilityManager {
                 </div>
             </div>
         `;
-        
+
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -651,27 +649,27 @@ class AccessibilityManager {
             align-items: center;
             justify-content: center;
         `;
-        
+
         const closeBtn = modal.querySelector('.close-btn');
         const closeModal = () => {
             modal.remove();
             this.restoreFocus();
         };
-        
+
         closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
+        modal.addEventListener('click', e => {
             if (e.target === modal.querySelector('.modal-backdrop')) {
                 closeModal();
             }
         });
-        
+
         document.addEventListener('keydown', function handleEscape(e) {
             if (e.key === 'Escape') {
                 closeModal();
                 document.removeEventListener('keydown', handleEscape);
             }
         });
-        
+
         this.saveFocus();
         document.body.appendChild(modal);
         closeBtn.focus();
@@ -680,7 +678,7 @@ class AccessibilityManager {
     enableScreenReaderFeatures() {
         // Add more descriptive content for screen readers
         document.body.setAttribute('data-screen-reader', 'true');
-        
+
         // Enhance grid descriptions
         const gameGrid = document.getElementById('sudoku-grid');
         if (gameGrid) {
@@ -698,13 +696,13 @@ class AccessibilityManager {
     setupHighContrast() {
         // Detect high contrast mode
         const supportsHighContrast = window.matchMedia('(prefers-contrast: high)').matches;
-        
+
         if (supportsHighContrast) {
             document.body.classList.add('high-contrast');
         }
-        
+
         // Listen for changes
-        window.matchMedia('(prefers-contrast: high)').addEventListener('change', (e) => {
+        window.matchMedia('(prefers-contrast: high)').addEventListener('change', e => {
             document.body.classList.toggle('high-contrast', e.matches);
         });
     }
@@ -732,19 +730,19 @@ class AccessibilityManager {
     // Public API
     setGameReference(gameUI) {
         this.gameUI = gameUI;
-        
+
         // Hook into game events
         if (gameUI) {
             // Override game methods to add accessibility
             const originalSelectCell = gameUI.selectCell.bind(gameUI);
-            gameUI.selectCell = (index) => {
+            gameUI.selectCell = index => {
                 originalSelectCell(index);
                 this.announceGridPosition(index);
                 this.updateCellDescription(document.querySelectorAll('.sudoku-cell')[index], index);
             };
-            
+
             const originalInputNumber = gameUI.inputNumber.bind(gameUI);
-            gameUI.inputNumber = (number) => {
+            gameUI.inputNumber = number => {
                 const result = originalInputNumber(number);
                 if (gameUI.selectedCell !== null) {
                     this.onNumberEntry(number, !result?.error);
@@ -757,7 +755,7 @@ class AccessibilityManager {
     updateGameState(gameState) {
         // Update ARIA descriptions based on game state
         this.updateGridCellsARIA();
-        
+
         // Update live regions with game status
         if (gameState.isCompleted) {
             this.onGameComplete(gameState);

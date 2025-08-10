@@ -1,7 +1,7 @@
 class SettingsManager {
     constructor(dataStorage = null) {
         this.dataStorage = dataStorage;
-        
+
         this.defaultSettings = {
             version: '1.0.0',
             theme: 'light', // light, dark, auto
@@ -52,10 +52,10 @@ class SettingsManager {
                 reminderTime: '18:00'
             }
         };
-        
+
         this.settings = { ...this.defaultSettings };
         this.settingsChangeListeners = [];
-        
+
         this.loadSettings();
     }
 
@@ -91,7 +91,7 @@ class SettingsManager {
             } else {
                 localStorage.setItem('sudoku-settings', JSON.stringify(this.settings));
             }
-            
+
             return { success: true };
         } catch (error) {
             console.error('Failed to save settings:', error);
@@ -101,7 +101,7 @@ class SettingsManager {
 
     mergeSettings(defaults, saved) {
         const merged = { ...defaults };
-        
+
         Object.keys(saved).forEach(key => {
             if (typeof defaults[key] === 'object' && defaults[key] !== null && !Array.isArray(defaults[key])) {
                 merged[key] = { ...defaults[key], ...saved[key] };
@@ -109,7 +109,7 @@ class SettingsManager {
                 merged[key] = saved[key];
             }
         });
-        
+
         return merged;
     }
 
@@ -118,7 +118,7 @@ class SettingsManager {
     get(path) {
         const keys = path.split('.');
         let value = this.settings;
-        
+
         for (const key of keys) {
             if (value && typeof value === 'object' && key in value) {
                 value = value[key];
@@ -126,7 +126,7 @@ class SettingsManager {
                 return undefined;
             }
         }
-        
+
         return value;
     }
 
@@ -134,23 +134,23 @@ class SettingsManager {
         const keys = path.split('.');
         const lastKey = keys.pop();
         let target = this.settings;
-        
+
         for (const key of keys) {
             if (!(key in target) || typeof target[key] !== 'object') {
                 target[key] = {};
             }
             target = target[key];
         }
-        
+
         const oldValue = target[lastKey];
         target[lastKey] = value;
-        
+
         const result = await this.saveSettings();
         if (result.success) {
             this.applySettings();
             this.notifySettingsChanged(path, value, oldValue);
         }
-        
+
         return result;
     }
 
@@ -209,7 +209,7 @@ class SettingsManager {
     applyTheme() {
         const theme = this.get('theme');
         const root = document.documentElement;
-        
+
         if (theme === 'auto') {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
@@ -220,25 +220,25 @@ class SettingsManager {
 
     applyDisplay() {
         const root = document.documentElement;
-        
+
         // Animations
         if (!this.get('display.animations')) {
             root.style.setProperty('--animation-duration', '0ms');
         } else {
             root.style.removeProperty('--animation-duration');
         }
-        
+
         // Reduced motion
         if (this.get('display.reducedMotion')) {
             root.classList.add('reduced-motion');
         } else {
             root.classList.remove('reduced-motion');
         }
-        
+
         // Font size
         const fontSize = this.get('display.fontSize');
         root.setAttribute('data-font-size', fontSize);
-        
+
         // Color scheme
         const colorScheme = this.get('display.colorScheme');
         root.setAttribute('data-color-scheme', colorScheme);
@@ -246,14 +246,14 @@ class SettingsManager {
 
     applyAccessibility() {
         const root = document.documentElement;
-        
+
         // High contrast mode
         if (this.get('display.colorScheme') === 'high-contrast') {
             root.classList.add('high-contrast');
         } else {
             root.classList.remove('high-contrast');
         }
-        
+
         // Reduced motion for users with motion sensitivity
         if (this.get('display.reducedMotion') || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             root.classList.add('reduced-motion');
@@ -314,13 +314,13 @@ class SettingsManager {
             }
 
             this.settings = this.mergeSettings(this.defaultSettings, settingsData);
-            
+
             const result = await this.saveSettings();
             if (result.success) {
                 this.applySettings();
                 this.notifySettingsChanged('all');
             }
-            
+
             return result;
         } catch (error) {
             console.error('Failed to restore settings:', error);
@@ -331,13 +331,13 @@ class SettingsManager {
     async resetToDefaults() {
         try {
             this.settings = { ...this.defaultSettings };
-            
+
             const result = await this.saveSettings();
             if (result.success) {
                 this.applySettings();
                 this.notifySettingsChanged('all');
             }
-            
+
             return result;
         } catch (error) {
             console.error('Failed to reset settings:', error);
@@ -378,27 +378,27 @@ class SettingsManager {
 
     validateSettings(settings) {
         const errors = [];
-        
+
         // Theme validation
         if (settings.theme && !['light', 'dark', 'auto'].includes(settings.theme)) {
             errors.push('Invalid theme value');
         }
-        
+
         // Sound volume validation
         if (settings.sound?.volume !== undefined && (settings.sound.volume < 0 || settings.sound.volume > 1)) {
             errors.push('Sound volume must be between 0 and 1');
         }
-        
+
         // Difficulty validation
         if (settings.difficulty?.defaultDifficulty && !['easy', 'medium', 'hard', 'expert'].includes(settings.difficulty.defaultDifficulty)) {
             errors.push('Invalid default difficulty');
         }
-        
+
         // Notification time validation
         if (settings.notifications?.reminderTime && !/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(settings.notifications.reminderTime)) {
             errors.push('Invalid notification time format');
         }
-        
+
         return {
             isValid: errors.length === 0,
             errors
@@ -409,8 +409,8 @@ class SettingsManager {
 
     isDarkMode() {
         const theme = this.get('theme');
-        if (theme === 'dark') return true;
-        if (theme === 'light') return false;
+        if (theme === 'dark') { return true; }
+        if (theme === 'light') { return false; }
         return window.matchMedia('(prefers-color-scheme: dark)').matches;
     }
 
@@ -430,18 +430,18 @@ class SettingsManager {
 // Auto-detect system preferences
 if (typeof window !== 'undefined') {
     // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
         if (window.settingsManager && window.settingsManager.get('theme') === 'auto') {
             window.settingsManager.applyTheme();
         }
     });
-    
+
     // Listen for reduced motion preference
-    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+    window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => {
         if (window.settingsManager) {
             window.settingsManager.applyAccessibility();
         }
     });
-    
+
     window.SettingsManager = SettingsManager;
 }
