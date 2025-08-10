@@ -65,7 +65,7 @@ module.exports = {
     },
     rules: {
         // Possible Errors
-        'no-console': ['warn', { allow: ['warn', 'error'] }],
+        'no-console': ['error', { allow: ['warn', 'error'] }],
         'no-debugger': 'error',
         'no-alert': 'off',
         
@@ -242,6 +242,12 @@ module.exports = {
             rules: {
                 'no-console': 'off',
                 'no-magic-numbers': 'off'
+            }
+        },
+        {
+            files: ['js/error-handler.js', 'js/performance-monitor.js', 'js/storage.js'],
+            rules: {
+                'no-console': ['warn', { allow: ['warn', 'error', 'log'] }]
             }
         }
     ]

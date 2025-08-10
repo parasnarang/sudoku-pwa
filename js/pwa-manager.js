@@ -1,3 +1,13 @@
+// Simple logger that respects production environment
+const logger = {
+    log: (...args) => {
+        if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV !== 'production') {
+            // eslint-disable-next-line no-console
+            console.log(...args);
+        }
+    }
+};
+
 class PWAManager {
     constructor() {
         this.deferredPrompt = null;
@@ -26,7 +36,7 @@ class PWAManager {
 
     setupInstallPrompt() {
         window.addEventListener('beforeinstallprompt', e => {
-            console.log('[PWA] Install prompt available');
+            logger.log('[PWA] Install prompt available');
             e.preventDefault();
             this.deferredPrompt = e;
 
@@ -35,7 +45,7 @@ class PWAManager {
         });
 
         window.addEventListener('appinstalled', e => {
-            console.log('[PWA] App installed successfully');
+            logger.log('[PWA] App installed successfully');
             this.isInstalled = true;
             this.deferredPrompt = null;
 
@@ -78,7 +88,7 @@ class PWAManager {
 
         try {
             const { outcome } = await this.deferredPrompt.prompt();
-            console.log('[PWA] Install prompt result:', outcome);
+            logger.log('[PWA] Install prompt result:', outcome);
 
             this.trackEvent('install_prompt_result', { outcome });
 
@@ -218,7 +228,7 @@ class PWAManager {
     }
 
     handleOnline() {
-        console.log('[PWA] Network: Online');
+        logger.log('[PWA] Network: Online');
         this.isOnline = true;
         this.lastOnlineTime = Date.now();
 
@@ -231,7 +241,7 @@ class PWAManager {
     }
 
     handleOffline() {
-        console.log('[PWA] Network: Offline');
+        logger.log('[PWA] Network: Offline');
         this.isOnline = false;
 
         this.updateNetworkStatus();
@@ -329,7 +339,7 @@ class PWAManager {
         }
 
         navigator.serviceWorker.ready.then(registration => registration.sync.register(tag)).then(() => {
-            console.log('[PWA] Background sync scheduled:', tag);
+            logger.log('[PWA] Background sync scheduled:', tag);
         })
             .catch(error => {
                 console.error('[PWA] Background sync failed:', error);
@@ -352,7 +362,7 @@ class PWAManager {
     async processSyncQueue() {
         if (!this.isOnline || this.syncQueue.length === 0) { return; }
 
-        console.log('[PWA] Processing sync queue:', this.syncQueue.length, 'items');
+        logger.log('[PWA] Processing sync queue:', this.syncQueue.length, 'items');
 
         const processedItems = [];
 
@@ -378,7 +388,7 @@ class PWAManager {
 
     async syncData(tag, data) {
         // Mock sync - in real implementation, this would sync with server
-        console.log('[PWA] Syncing data:', tag, data);
+        logger.log('[PWA] Syncing data:', tag, data);
 
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -423,7 +433,7 @@ class PWAManager {
                     this.handleCacheCleared(data);
                     break;
                 default:
-                    console.log('[PWA] Unknown SW message:', type, data);
+                    logger.log('[PWA] Unknown SW message:', type, data);
             }
         });
     }
@@ -439,7 +449,7 @@ class PWAManager {
     }
 
     handleSyncSuccess(data) {
-        console.log('[PWA] Sync successful:', data.type);
+        logger.log('[PWA] Sync successful:', data.type);
         this.showToast(`${data.type} synced successfully`, 'success');
     }
 
@@ -449,7 +459,7 @@ class PWAManager {
     }
 
     handleCacheCleared(data) {
-        console.log('[PWA] Cache cleared:', data.cacheName);
+        logger.log('[PWA] Cache cleared:', data.cacheName);
         if (data.success) {
             this.showToast('Cache cleared successfully', 'success');
         }
@@ -483,7 +493,7 @@ class PWAManager {
     async requestNotificationPermission() {
         try {
             const permission = await Notification.requestPermission();
-            console.log('[PWA] Notification permission:', permission);
+            logger.log('[PWA] Notification permission:', permission);
 
             if (permission === 'granted') {
                 await this.subscribeToPushNotifications();
@@ -504,7 +514,7 @@ class PWAManager {
             // Check if already subscribed
             const existingSubscription = await registration.pushManager.getSubscription();
             if (existingSubscription) {
-                console.log('[PWA] Already subscribed to push notifications');
+                logger.log('[PWA] Already subscribed to push notifications');
                 return existingSubscription;
             }
 
@@ -514,7 +524,7 @@ class PWAManager {
                 applicationServerKey: this.urlBase64ToUint8Array('your-vapid-public-key-here')
             });
 
-            console.log('[PWA] Subscribed to push notifications');
+            logger.log('[PWA] Subscribed to push notifications');
 
             // Send subscription to server (in real implementation)
             // await this.sendSubscriptionToServer(subscription);
@@ -533,7 +543,7 @@ class PWAManager {
 
             if (subscription) {
                 await subscription.unsubscribe();
-                console.log('[PWA] Unsubscribed from push notifications');
+                logger.log('[PWA] Unsubscribed from push notifications');
 
                 // Remove from server (in real implementation)
                 // await this.removeSubscriptionFromServer(subscription);
@@ -564,7 +574,7 @@ class PWAManager {
             setTimeout(() => this.scheduleDailyReminder(), 24 * 60 * 60 * 1000);
         }, delay);
 
-        console.log('[PWA] Daily reminder scheduled for:', reminderDate.toLocaleString());
+        logger.log('[PWA] Daily reminder scheduled for:', reminderDate.toLocaleString());
     }
 
     showDailyReminder() {
@@ -608,7 +618,7 @@ class PWAManager {
 
     trackEvent(eventName, data = {}) {
         // Analytics tracking - implement based on your analytics provider
-        console.log('[PWA] Event:', eventName, data);
+        logger.log('[PWA] Event:', eventName, data);
 
         // Example: Send to analytics service
         // gtag('event', eventName, data);
