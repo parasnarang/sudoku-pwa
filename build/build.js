@@ -458,7 +458,7 @@ class BuildOptimizer {
 
     addVendorPrefixes(css) {
         // Add common vendor prefixes
-        const prefixes = [
+        const vendorPrefixes = [
             { prop: 'transform', prefixes: ['-webkit-', '-moz-', '-ms-'] },
             { prop: 'transition', prefixes: ['-webkit-', '-moz-', '-ms-'] },
             { prop: 'user-select', prefixes: ['-webkit-', '-moz-', '-ms-'] },
@@ -468,7 +468,7 @@ class BuildOptimizer {
         
         let processedCSS = css;
         
-        for (const { prop, prefixes } of prefixes) {
+        for (const { prop, prefixes } of vendorPrefixes) {
             const regex = new RegExp(`(^|[^-])${prop}\\s*:`, 'gm');
             processedCSS = processedCSS.replace(regex, (match, prefix) => {
                 const prefixedProps = prefixes.map(p => `${prefix}${p}${prop}:`).join(' ');
@@ -929,6 +929,3 @@ if (require.main === module) {
 }
 
 module.exports = BuildOptimizer;
-`;
-
-await fs.writeFile(outputPath, buildContent);
