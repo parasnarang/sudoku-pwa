@@ -703,7 +703,7 @@ class BuildOptimizer {
         const isGitHubPages = baseUrl.includes('github.io');
         
         if (isGitHubPages) {
-            // For GitHub Pages, use only relative paths
+            // For GitHub Pages subdirectory, use relative paths (no leading slash)
             files.push('./');
             files.push('manifest.json');
             
@@ -719,7 +719,7 @@ class BuildOptimizer {
             const iconFiles = await this.findFiles(path.join(this.buildDir, 'icons'), '.png');
             files.push(...iconFiles.map(f => 'icons/' + path.basename(f)));
         } else {
-            // For other deployments, use absolute paths
+            // For root domain deployments, use absolute paths
             files.push('/');
             files.push('/manifest.json');
             

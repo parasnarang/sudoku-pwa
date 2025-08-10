@@ -785,17 +785,58 @@
         console.log('📍 Current location:', window.location.href);
         console.log('🏠 Base URL:', window.location.origin);
         
-        // EMERGENCY FIX: Hide loading screen immediately and show app
-        console.log('🚨 EMERGENCY FIX: Hiding loading screen immediately');
+        // 🔄 CACHE BUSTING: Force fresh assets by adding timestamp
+        const cacheBustParam = '?cb=' + Date.now();
+        console.log('💾 Cache busting with parameter:', cacheBustParam);
+        
+        // NUCLEAR FIX: Multiple attempts to hide loading screen
+        console.log('🚨 NUCLEAR FIX: Multiple attempts to hide loading screen');
+        
+        // Immediate attempt
         setTimeout(() => {
+            console.log('🔥 NUCLEAR FIX ATTEMPT 1: Immediate');
             const loadingScreen = document.getElementById('loading-screen');
             const app = document.getElementById('app');
-            if (loadingScreen && app) {
-                loadingScreen.style.display = 'none';
-                app.classList.remove('hidden');
-                console.log('✅ EMERGENCY FIX: Loading screen hidden, app shown');
+            
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none !important';
+                loadingScreen.style.visibility = 'hidden';
+                loadingScreen.style.opacity = '0';
+                loadingScreen.remove();
+                console.log('✅ Loading screen removed');
             }
-        }, 1000);
+            
+            if (app) {
+                app.classList.remove('hidden');
+                app.style.display = 'block';
+                app.style.visibility = 'visible';
+                app.style.opacity = '1';
+                console.log('✅ App made visible');
+            }
+            
+            // Also add CSS override
+            const style = document.createElement('style');
+            style.innerHTML = `
+                #loading-screen { display: none !important; }
+                #app { display: block !important; opacity: 1 !important; }
+                .hidden { display: block !important; }
+            `;
+            document.head.appendChild(style);
+            console.log('✅ CSS override added');
+            
+        }, 100);
+        
+        // Backup attempts
+        setTimeout(() => {
+            console.log('🔥 NUCLEAR FIX ATTEMPT 2: 500ms backup');
+            document.body.innerHTML = `
+                <div style="padding: 20px; font-family: Arial, sans-serif;">
+                    <h1>🎯 Sudoku Master - Emergency Mode</h1>
+                    <p>The app is loading in emergency mode. Please wait...</p>
+                    <button onclick="location.reload()" style="padding: 10px 20px; font-size: 16px;">Reload App</button>
+                </div>
+            `;
+        }, 500);
         
         // Check if scripts are loading
         window.addEventListener('error', (e) => {
