@@ -797,6 +797,28 @@
         const scripts = document.getElementsByTagName('script');
         console.log('📜 Total scripts found:', scripts.length);
         
+        // Add event listeners to track script loading
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📋 DOM Content Loaded event fired');
+            const externalScripts = Array.from(document.querySelectorAll('script[src]'));
+            console.log('🔗 External scripts to load:', externalScripts.length);
+            
+            externalScripts.forEach((script, index) => {
+                console.log(`📜 Script ${index + 1}: ${script.src}`);
+                
+                script.addEventListener('load', () => {
+                    console.log(`✅ Script ${index + 1} loaded successfully: ${script.src}`);
+                });
+                
+                script.addEventListener('error', (e) => {
+                    console.error(`❌ Script ${index + 1} failed to load: ${script.src}`, e);
+                });
+            });
+        });
+        
+        // Temporarily disable service worker for debugging
+        console.log('🚫 Service worker registration disabled for debugging');
+        /*
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 console.log('🚀 Window load event fired');
@@ -809,6 +831,7 @@
                     });
             });
         }
+        */
 
         let gameUI;
         let userProgress;
