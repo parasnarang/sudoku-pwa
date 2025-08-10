@@ -577,7 +577,7 @@ class BuildOptimizer {
             }
             
             // Add bundle script tags - use relative paths for GitHub Pages
-            const scriptPrefix = isGitHubPages ? './js/' : (baseUrl ? `${baseUrl}/js/` : 'js/');
+            const scriptPrefix = isGitHubPages ? 'js/' : (baseUrl ? `${baseUrl}/js/` : 'js/');
             const bundleScripts = `
     <script src="${scriptPrefix}${appBundle}"></script>
     <script src="${scriptPrefix}${uiBundle}"></script>
@@ -604,9 +604,9 @@ class BuildOptimizer {
         
         // Update other asset references - use relative paths for GitHub Pages
         if (isGitHubPages) {
-            // For GitHub Pages, convert absolute paths to relative paths
-            html = html.replace(/src="\/(?!\/)/g, 'src="./');
-            html = html.replace(/href="\/(?!\/|#)/g, 'href="./');
+            // For GitHub Pages, convert absolute paths to relative paths (without ./ prefix)
+            html = html.replace(/src="\/(?!\/)/g, 'src="');
+            html = html.replace(/href="\/(?!\/|#)/g, 'href="');
         } else if (baseUrl) {
             html = html.replace(/src="(?!http|\/\/|data:)([^"]*)/g, `src="${baseUrl}/$1`);
             html = html.replace(/href="(?!http|\/\/|#|.*\/)([^"]*)/g, `href="${baseUrl}/$1`);
