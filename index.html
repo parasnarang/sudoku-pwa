@@ -787,10 +787,17 @@
         
         // Check if scripts are loading
         window.addEventListener('error', (e) => {
-            console.error('❌ RESOURCE LOADING ERROR:', e.filename, e.message);
+            console.error('❌ GLOBAL ERROR:', e.filename, e.message, e.error);
             if (e.filename && e.filename.includes('.js')) {
                 console.error('🚨 JavaScript file failed to load:', e.filename);
+            } else if (e.error) {
+                console.error('🚨 JavaScript execution error:', e.error.stack || e.error);
             }
+        });
+        
+        // Catch unhandled promise rejections
+        window.addEventListener('unhandledrejection', (e) => {
+            console.error('❌ UNHANDLED PROMISE REJECTION:', e.reason);
         });
         
         // Track when scripts load

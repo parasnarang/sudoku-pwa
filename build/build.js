@@ -224,6 +224,10 @@ class BuildOptimizer {
                         
                         // Add file separator and content directly (classes need global scope)
                         bundledContent += `\n/* === ${file} === */\n`;
+                        // Add execution tracking for debugging
+                        if (file === bundle.files[0]) {
+                            bundledContent += `console.log('🚀 ${bundle.name.toUpperCase()} BUNDLE EXECUTING - ${file}');\n`;
+                        }
                         bundledContent += `${content}\n`;
                         
                     } catch (fileError) {
