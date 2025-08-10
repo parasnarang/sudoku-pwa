@@ -2,7 +2,7 @@
 
 A comprehensive Progressive Web Application featuring tournaments, daily challenges, offline support, and advanced gameplay features.
 
-[![Build Status](https://github.com/your-username/sudoku-pwa/workflows/Build%20and%20Deploy/badge.svg)](https://github.com/your-username/sudoku-pwa/actions)
+[![Build Status](https://github.com/parasnarang/sudoku-pwa/workflows/Build%20and%20Deploy/badge.svg)](https://github.com/parasnarang/sudoku-pwa/actions)
 [![Netlify Status](https://api.netlify.com/api/v1/badges/your-site-id/deploy-status.svg)](https://app.netlify.com/sites/sudoku-pwa/deploys)
 [![Lighthouse Score](https://img.shields.io/badge/Lighthouse-100%2F100-brightgreen.svg)](https://web.dev/measure/)
 
@@ -41,7 +41,7 @@ A comprehensive Progressive Web Application featuring tournaments, daily challen
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/sudoku-pwa.git
+git clone https://github.com/parasnarang/sudoku-pwa.git
 cd sudoku-pwa
 
 # Install dependencies
@@ -246,10 +246,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-- 🐛 [Report Issues](https://github.com/your-username/sudoku-pwa/issues)
-- 💬 [Discussions](https://github.com/your-username/sudoku-pwa/discussions)
-- 📧 Email: support@sudoku-pwa.com
-- 🌐 Website: https://sudoku-pwa.netlify.app
+- 🐛 [Report Issues](https://github.com/parasnarang/sudoku-pwa/issues)
+- 💬 [Discussions](https://github.com/parasnarang/sudoku-pwa/discussions)
 
 ---
 
