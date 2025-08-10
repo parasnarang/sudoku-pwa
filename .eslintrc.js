@@ -60,7 +60,8 @@ module.exports = {
         'errorHandler': 'writable',
         
         // Browser globals
-        'gc': 'readonly' // Optional garbage collection function
+        'gc': 'readonly', // Optional garbage collection function
+        'gtag': 'readonly' // Google Analytics
     },
     rules: {
         // Possible Errors

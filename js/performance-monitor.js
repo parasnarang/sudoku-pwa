@@ -607,13 +607,14 @@ class PerformanceMonitor {
     sendToAnalytics(report) {
         // Example implementation - replace with your analytics service
         try {
-            if (typeof gtag === 'function') {
-                gtag('event', 'performance_report', {
-                    custom_parameter: {
+            // Check if gtag is available (Google Analytics)
+            if (typeof window.gtag === 'function') {
+                window.gtag('event', 'performance_report', {
+                    customParameter: {
                         score: report.score,
-                        load_time: report.metrics.pageLoad.loadComplete,
-                        memory_usage: report.metrics.memory.usedJSHeapSize,
-                        error_count: report.metrics.errors.length
+                        loadTime: report.metrics.pageLoad.loadComplete,
+                        memoryUsage: report.metrics.memory.usedJSHeapSize,
+                        errorCount: report.metrics.errors.length
                     }
                 });
             }
@@ -660,15 +661,15 @@ const PerformanceUtils = {
     },
 
     // Throttle function for performance
-    throttle: (func, limit) => {
+    throttle(func, limit) {
         let inThrottle;
-        return function() {
-            const args = arguments;
-            const context = this;
+        return function(...args) {
             if (!inThrottle) {
-                func.apply(context, args);
+                func(...args);
                 inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
+                setTimeout(() => {
+                    inThrottle = false;
+                }, limit);
             }
         };
     },
