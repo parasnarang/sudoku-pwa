@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2196F3">
+    <meta name="description" content="Sudoku Master - A Progressive Web App with daily challenges and tournament mode">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Sudoku Master">
+    <meta name="msapplication-TileColor" content="#2196F3">
+    
+    <title>Sudoku Master</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/x-icon" href="images/icons/favicon.ico">
+    <link rel="apple-touch-icon" href="images/icons/icon-192x192.png">
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="sudoku-grid-mini">
+                    <div></div><div></div><div></div>
+                    <div></div><div></div><div></div>
+                    <div></div><div></div><div></div>
+                </div>
+            </div>
+            <h1>Sudoku Master</h1>
+            <div class="loading-spinner"></div>
+            <p>Loading your puzzles...</p>
+        </div>
+    </div>
+
+    <div id="app" class="app hidden">
+        <header class="app-header">
+            <button id="back-btn" class="back-btn hidden">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </button>
+            <h1 id="page-title">Sudoku Master</h1>
+            <div class="header-actions">
+                <button id="install-app-btn" class="install-app-btn" style="display: none;">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z"/>
+                    </svg>
+                    <span>Install</span>
+                </button>
+                <button id="menu-btn" class="menu-btn">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main id="main-content" class="main-content">
+            <div id="homepage" class="page active">
+                <div class="cards-container">
+                    <div class="challenge-card daily-card" id="daily-challenge-card">
+                        <div class="card-status" id="daily-status"></div>
+                        <div class="progress-indicator" id="daily-progress" style="width: 0%"></div>
+                        <div class="card-icon">📅</div>
+                        <div class="card-content">
+                            <h2>DAILY CHALLENGE</h2>
+                            <p class="date" id="current-date">August 10</p>
+                            <button class="play-btn btn-with-icon" id="daily-play-btn">
+                                <span>Play</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="challenge-card tournament-card" id="tournament-card">
+                        <div class="card-status" id="tournament-status">Level <span id="current-level">1</span></div>
+                        <div class="progress-indicator" id="tournament-progress" style="width: 0%"></div>
+                        <div class="card-icon">🏆</div>
+                        <div class="card-content">
+                            <h2>TOURNAMENT</h2>
+                            <p class="score">Score: <span id="tournament-score">0</span></p>
+                            <p class="timer" id="tournament-timer">8d 08h</p>
+                            <button class="play-btn btn-with-icon" id="tournament-play-btn">
+                                <span>Play</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stat-card" id="best-score-card">
+                        <div class="achievement-badge" id="achievement-count">0</div>
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-content">
+                            <h3>All-Time Best Score</h3>
+                            <p class="stat-value" id="best-score">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" id="streak-card">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-content">
+                            <h3>Current Streak</h3>
+                            <p class="stat-value" id="win-streak">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" id="completion-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <h3>Completion Rate</h3>
+                            <p class="stat-value" id="completion-rate">0%</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card" id="games-played-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <h3>Games Played</h3>
+                            <p class="stat-value" id="games-played">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="new-game-btn pulse-effect" id="new-game-btn">
+                    <span class="btn-icon">🔥</span>
+                    <span class="btn-text">New Game</span>
+                    <span class="btn-indicator">+1</span>
+                </button>
+            </div>
+
+            <div id="game-page" class="page">
+                <div class="game-header">
+                    <div class="game-info">
+                        <div class="game-timer">
+                            <svg viewBox="0 0 24 24" width="16" height="16">
+                                <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                            </svg>
+                            <span id="game-timer-text">00:00</span>
+                            <button id="pause-btn" class="icon-btn">
+                                <svg viewBox="0 0 24 24" width="16" height="16">
+                                    <path fill="currentColor" d="M14,19H18V5H14M6,19H10V5H6V19Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="game-difficulty">
+                            <span id="difficulty-text">Medium</span>
+                            <span id="score-multiplier">×1.5</span>
+                        </div>
+                    </div>
+                    <div class="game-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Mistakes</span>
+                            <span id="mistakes-count">0/3</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Score</span>
+                            <span id="current-score">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sudoku-container">
+                    <div id="sudoku-grid" class="sudoku-grid">
+                        <!-- Grid cells will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="game-controls">
+                    <div class="number-pad">
+                        <button class="number-btn" data-number="1">1</button>
+                        <button class="number-btn" data-number="2">2</button>
+                        <button class="number-btn" data-number="3">3</button>
+                        <button class="number-btn" data-number="4">4</button>
+                        <button class="number-btn" data-number="5">5</button>
+                        <button class="number-btn" data-number="6">6</button>
+                        <button class="number-btn" data-number="7">7</button>
+                        <button class="number-btn" data-number="8">8</button>
+                        <button class="number-btn" data-number="9">9</button>
+                    </div>
+                    
+                    <div class="action-controls">
+                        <button id="undo-btn" class="action-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M12.5,8C9.85,8 7.45,9 5.6,10.6L2,7V16H11L7.38,12.38C8.77,11.22 10.54,10.5 12.5,10.5C16.04,10.5 19.05,12.81 20.1,16L22.47,15.22C21.08,11.03 17.15,8 12.5,8Z"/>
+                            </svg>
+                            <span>Undo</span>
+                        </button>
+                        
+                        <button id="erase-btn" class="action-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M16.24,3.56L21.19,8.5C21.97,9.29 21.97,10.55 21.19,11.34L12,20.53C10.44,22.09 7.91,22.09 6.34,20.53L2.81,17C2.03,16.21 2.03,14.95 2.81,14.16L13.41,3.56C14.2,2.78 15.46,2.78 16.24,3.56M4.22,15.58L7.76,19.11C8.54,19.9 9.8,19.9 10.59,19.11L14.12,15.58L9.17,10.63L4.22,15.58Z"/>
+                            </svg>
+                            <span>Erase</span>
+                        </button>
+                        
+                        <button id="notes-btn" class="action-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                            </svg>
+                            <span>Notes</span>
+                        </button>
+                        
+                        <button id="hint-btn" class="action-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M7,14L12,9L17,14H7Z"/>
+                            </svg>
+                            <span>Hint</span>
+                            <div class="hint-counter" id="hint-counter">3</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="game-overlay" class="game-overlay hidden">
+                    <div class="overlay-content">
+                        <h2 id="overlay-title">Game Paused</h2>
+                        <p id="overlay-message">Tap resume to continue</p>
+                        <div class="overlay-actions">
+                            <button id="resume-btn" class="overlay-btn primary">Resume</button>
+                            <button id="quit-btn" class="overlay-btn secondary">Quit Game</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="calendar-page" class="page">
+                <div class="calendar-header">
+                    <div class="calendar-title-section">
+                        <div class="calendar-trophy">🏆</div>
+                        <div class="calendar-info">
+                            <h2 id="calendar-month-year">July 2025</h2>
+                            <div class="calendar-progress">
+                                <span id="calendar-completion">7/31 completed</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="calendar-progress-fill" style="width: 23%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-nav">
+                        <button id="prev-month-btn" class="calendar-nav-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M15.41,16.58L10.83,12L15.41,7.41L14,6L8,12L14,18L15.41,16.58Z"/>
+                            </svg>
+                        </button>
+                        <button id="today-btn" class="today-btn">Today</button>
+                        <button id="next-month-btn" class="calendar-nav-btn">
+                            <svg viewBox="0 0 24 24" width="24" height="24">
+                                <path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="calendar-container">
+                    <div class="calendar-weekdays">
+                        <div class="weekday">Sun</div>
+                        <div class="weekday">Mon</div>
+                        <div class="weekday">Tue</div>
+                        <div class="weekday">Wed</div>
+                        <div class="weekday">Thu</div>
+                        <div class="weekday">Fri</div>
+                        <div class="weekday">Sat</div>
+                    </div>
+                    
+                    <div id="calendar-grid" class="calendar-grid">
+                        <!-- Calendar days will be generated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="calendar-stats">
+                    <div class="streak-display">
+                        <div class="streak-icon">🔥</div>
+                        <div class="streak-info">
+                            <div class="streak-number" id="current-streak-display">0</div>
+                            <div class="streak-label">Day Streak</div>
+                        </div>
+                    </div>
+                    
+                    <div class="month-achievements">
+                        <div class="achievement-item">
+                            <span class="achievement-icon">⭐</span>
+                            <span id="perfect-days">0 Perfect Days</span>
+                        </div>
+                        <div class="achievement-item">
+                            <span class="achievement-icon">⚡</span>
+                            <span id="speed-completions">0 Speed Runs</span>
+                        </div>
+                        <div class="achievement-item">
+                            <span class="achievement-icon">🎯</span>
+                            <span id="no-hint-days">0 No-Hint Days</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="day-detail-modal" class="day-detail-modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 id="modal-date">August 10, 2025</h3>
+                            <button id="close-modal-btn" class="close-modal-btn">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div id="modal-status" class="challenge-status">
+                                <!-- Status will be populated by JavaScript -->
+                            </div>
+                            
+                            <div id="modal-stats" class="challenge-stats">
+                                <!-- Stats will be populated by JavaScript -->
+                            </div>
+                            
+                            <div class="modal-actions">
+                                <button id="play-challenge-btn" class="modal-action-btn primary">
+                                    Play Challenge
+                                </button>
+                                <button id="view-solution-btn" class="modal-action-btn secondary hidden">
+                                    View Solution
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tournament-page" class="page">
+                <div class="tournament-background">
+                    <div class="water-overlay"></div>
+                    <div class="tournament-header">
+                        <div class="tournament-info">
+                            <div class="tournament-title">
+                                <h2>🏆 Weekly Tournament</h2>
+                                <p class="tournament-subtitle">Conquer the Tropical Islands</p>
+                            </div>
+                            <div class="tournament-stats">
+                                <div class="tournament-stat">
+                                    <div class="stat-icon">🏝️</div>
+                                    <div class="stat-content">
+                                        <span class="stat-number" id="levels-completed">0</span>
+                                        <span class="stat-label">/ 22 Levels</span>
+                                    </div>
+                                </div>
+                                <div class="tournament-stat">
+                                    <div class="stat-icon">👥</div>
+                                    <div class="stat-content">
+                                        <span class="stat-number" id="participants-count">100</span>
+                                        <span class="stat-label">Players</span>
+                                    </div>
+                                </div>
+                                <div class="tournament-stat">
+                                    <div class="stat-icon">⏱️</div>
+                                    <div class="stat-content">
+                                        <span class="stat-number" id="tournament-time-left">6d 12h</span>
+                                        <span class="stat-label">Remaining</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tournament-score-board">
+                            <div class="score-display">
+                                <div class="score-icon">💎</div>
+                                <div class="score-info">
+                                    <div class="current-score" id="tournament-current-score">0</div>
+                                    <div class="score-label">Tournament Score</div>
+                                </div>
+                            </div>
+                            <div class="rank-display">
+                                <div class="rank-badge" id="current-rank">#--</div>
+                                <div class="rank-label">Your Rank</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tournament-map-container">
+                        <div class="map-background">
+                            <div class="water-waves"></div>
+                            <div class="floating-islands">
+                                <!-- Islands will be generated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div id="tournament-levels" class="tournament-levels">
+                            <!-- Level nodes will be generated by JavaScript -->
+                        </div>
+                        
+                        <div class="map-decorations">
+                            <div class="palm-tree palm-1">🌴</div>
+                            <div class="palm-tree palm-2">🌴</div>
+                            <div class="palm-tree palm-3">🌴</div>
+                            <div class="treasure-chest">💰</div>
+                        </div>
+                    </div>
+
+                    <div class="tournament-actions">
+                        <button id="tournament-leaderboard-btn" class="tournament-action-btn secondary">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M7.5,21L3,16.5L4.41,15.09L7.5,18.17L19.59,6.09L21,7.5L7.5,21Z"/>
+                            </svg>
+                            <span>Leaderboard</span>
+                        </button>
+                        
+                        <button id="tournament-rules-btn" class="tournament-action-btn secondary">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M11,18H13V16H11V18M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20C7.59,20 4,16.41 4,12C7.59,4 4,12A10,10 0 0,0 12,20Z"/>
+                            </svg>
+                            <span>Rules</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Level Detail Modal -->
+                <div id="level-detail-modal" class="level-detail-modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="level-header">
+                                <div class="level-icon" id="modal-level-icon">🏝️</div>
+                                <div class="level-title">
+                                    <h3 id="modal-level-name">Island Paradise</h3>
+                                    <p id="modal-level-number">Level 1</p>
+                                </div>
+                            </div>
+                            <button id="close-level-modal-btn" class="close-modal-btn">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div id="level-status" class="level-status">
+                                <!-- Status will be populated by JavaScript -->
+                            </div>
+                            
+                            <div class="level-constraints" id="level-constraints">
+                                <!-- Constraints will be populated by JavaScript -->
+                            </div>
+                            
+                            <div class="level-rewards" id="level-rewards">
+                                <!-- Rewards will be populated by JavaScript -->
+                            </div>
+                            
+                            <div class="level-best-score" id="level-best-score">
+                                <!-- Best score will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        
+                        <div class="modal-actions">
+                            <button id="play-level-btn" class="modal-action-btn primary">
+                                <span>🚀 Start Level</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Modal -->
+                <div id="leaderboard-modal" class="leaderboard-modal hidden">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>🏆 Tournament Leaderboard</h3>
+                            <button id="close-leaderboard-btn" class="close-modal-btn">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <div id="leaderboard-content" class="leaderboard-content">
+                                <!-- Leaderboard will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="profile-page" class="page">
+                <div class="profile-container">
+                    <!-- Profile Header -->
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <div class="avatar-circle">
+                                <span class="avatar-icon">👤</span>
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h2 class="profile-name">Sudoku Player</h2>
+                            <p class="profile-level" id="profile-level">Master Level</p>
+                            <div class="profile-stats">
+                                <div class="stat-item">
+                                    <span class="stat-value" id="profile-games-played">0</span>
+                                    <span class="stat-label">Games</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="profile-achievements-count">0</span>
+                                    <span class="stat-label">Achievements</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-value" id="profile-current-streak">0</span>
+                                    <span class="stat-label">Streak</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Sections -->
+                    <div class="settings-sections">
+                        
+                        <!-- Theme & Display -->
+                        <div class="settings-section">
+                            <h3 class="section-title">🎨 Display</h3>
+                            <div class="settings-grid">
+                                <div class="setting-item">
+                                    <label for="theme-select">Theme</label>
+                                    <select id="theme-select" class="setting-input">
+                                        <option value="auto">Auto</option>
+                                        <option value="light">Light</option>
+                                        <option value="dark">Dark</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="font-size-select">Font Size</label>
+                                    <select id="font-size-select" class="setting-input">
+                                        <option value="small">Small</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="large">Large</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="animations-toggle">Animations</label>
+                                        <input type="checkbox" id="animations-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="reduced-motion-toggle">Reduced Motion</label>
+                                        <input type="checkbox" id="reduced-motion-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gameplay -->
+                        <div class="settings-section">
+                            <h3 class="section-title">🎯 Gameplay</h3>
+                            <div class="settings-grid">
+                                <div class="setting-item">
+                                    <label for="default-difficulty-select">Default Difficulty</label>
+                                    <select id="default-difficulty-select" class="setting-input">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="hard">Hard</option>
+                                        <option value="expert">Expert</option>
+                                    </select>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="auto-save-toggle">Auto Save</label>
+                                        <input type="checkbox" id="auto-save-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="highlight-errors-toggle">Highlight Errors</label>
+                                        <input type="checkbox" id="highlight-errors-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="show-timer-toggle">Show Timer</label>
+                                        <input type="checkbox" id="show-timer-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sound -->
+                        <div class="settings-section">
+                            <h3 class="section-title">🔊 Sound</h3>
+                            <div class="settings-grid">
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="sound-enabled-toggle">Sound Effects</label>
+                                        <input type="checkbox" id="sound-enabled-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="sound-volume-range">Volume</label>
+                                    <div class="volume-control">
+                                        <span class="volume-label">🔈</span>
+                                        <input type="range" id="sound-volume-range" class="setting-range" 
+                                               min="0" max="1" step="0.1" value="0.7">
+                                        <span class="volume-label">🔊</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Notifications -->
+                        <div class="settings-section">
+                            <h3 class="section-title">🔔 Notifications</h3>
+                            <div class="settings-grid">
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="daily-reminder-toggle">Daily Reminders</label>
+                                        <input type="checkbox" id="daily-reminder-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                                <div class="setting-item">
+                                    <label for="reminder-time-input">Reminder Time</label>
+                                    <input type="time" id="reminder-time-input" class="setting-input" value="18:00">
+                                </div>
+                                <div class="setting-item">
+                                    <div class="setting-toggle">
+                                        <label for="achievement-notifications-toggle">Achievement Notifications</label>
+                                        <input type="checkbox" id="achievement-notifications-toggle" class="toggle-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data Management -->
+                        <div class="settings-section">
+                            <h3 class="section-title">💾 Data Management</h3>
+                            <div class="data-management-grid">
+                                <div class="storage-info">
+                                    <h4>Storage Usage</h4>
+                                    <div class="storage-bar">
+                                        <div class="storage-fill" id="storage-usage-bar" style="width: 0%"></div>
+                                    </div>
+                                    <p class="storage-details" id="storage-details">Loading...</p>
+                                </div>
+                                
+                                <div class="data-actions">
+                                    <button class="data-action-btn primary" id="backup-data-btn">
+                                        <span class="btn-icon">📥</span>
+                                        <span>Backup Data</span>
+                                    </button>
+                                    <button class="data-action-btn secondary" id="restore-data-btn">
+                                        <span class="btn-icon">📤</span>
+                                        <span>Restore Data</span>
+                                    </button>
+                                    <button class="data-action-btn danger" id="reset-data-btn">
+                                        <span class="btn-icon">🗑️</span>
+                                        <span>Reset All Data</span>
+                                    </button>
+                                    <button class="data-action-btn secondary" id="cleanup-storage-btn">
+                                        <span class="btn-icon">🧹</span>
+                                        <span>Cleanup Storage</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PWA Features -->
+                        <div class="settings-section">
+                            <h3 class="section-title">📱 App Features</h3>
+                            <div class="pwa-features-grid">
+                                <div class="pwa-feature-item" id="install-status">
+                                    <div class="feature-icon">⬇️</div>
+                                    <div class="feature-content">
+                                        <h4>Install App</h4>
+                                        <p class="feature-status" id="install-status-text">Available for install</p>
+                                        <button class="feature-action-btn" id="profile-install-btn" style="display: none;">
+                                            Install App
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="pwa-feature-item" id="offline-status">
+                                    <div class="feature-icon">📶</div>
+                                    <div class="feature-content">
+                                        <h4>Network Status</h4>
+                                        <p class="feature-status" id="network-status-text">Online</p>
+                                        <p class="feature-detail" id="sync-queue-status">Sync queue: 0 items</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="pwa-feature-item">
+                                    <div class="feature-icon">🔄</div>
+                                    <div class="feature-content">
+                                        <h4>Updates</h4>
+                                        <p class="feature-status">Version 2.0.0</p>
+                                        <button class="feature-action-btn secondary" id="check-updates-btn">
+                                            Check for Updates
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="pwa-feature-item">
+                                    <div class="feature-icon">🔔</div>
+                                    <div class="feature-content">
+                                        <h4>Push Notifications</h4>
+                                        <p class="feature-status" id="notification-status">Disabled</p>
+                                        <button class="feature-action-btn secondary" id="enable-notifications-btn">
+                                            Enable Notifications
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- About -->
+                        <div class="settings-section">
+                            <h3 class="section-title">ℹ️ About</h3>
+                            <div class="about-content">
+                                <div class="app-info">
+                                    <h4>Sudoku Master</h4>
+                                    <p class="version">Version 2.0.0 (PWA Enhanced)</p>
+                                    <p class="description">A Progressive Web App for Sudoku enthusiasts with offline support, background sync, and push notifications</p>
+                                </div>
+                                <div class="app-stats">
+                                    <div class="stat-row">
+                                        <span>Install Status</span>
+                                        <span id="install-date">Web App</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Last Played</span>
+                                        <span id="last-played">Today</span>
+                                    </div>
+                                    <div class="stat-row">
+                                        <span>Service Worker</span>
+                                        <span id="sw-status">Active</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hidden file input for restore -->
+                <input type="file" id="restore-file-input" accept=".json" style="display: none;">
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="homepage">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span>Main</span>
+            </button>
+            <button class="nav-item" data-page="calendar-page">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                </svg>
+                <span>Daily</span>
+            </button>
+            <button class="nav-item" data-page="tournament-page">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M5,16L3,5H1V3H4L6,14H18.5L20,7H8V5H21.68A1,1 0 0,1 22.64,6.39L20.89,14.21C20.76,14.76 20.27,15.14 19.7,15.14H6.5L5.96,17.5H19V19.5H5V16Z"/>
+                </svg>
+                <span>Tournament</span>
+            </button>
+            <button class="nav-item" data-page="profile-page">
+                <svg viewBox="0 0 24 24" width="24" height="24">
+                    <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                <span>Me</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="js/sudoku-engine.js"></script>
+    <script src="js/sudoku-generator.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/settings-manager.js"></script>
+    <script src="js/pwa-manager.js"></script>
+    <script src="js/animation-manager.js"></script>
+    <script src="js/accessibility-manager.js"></script>
+    <script src="js/performance-monitor.js"></script>
+    <script src="js/user-progress.js"></script>
+    <script src="js/calendar-ui.js"></script>
+    <script src="js/tournament-ui.js"></script>
+    <script src="js/app-router.js"></script>
+    <script src="js/game-ui.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        let gameUI;
+        let userProgress;
+        let appRouter;
+        let dataStorage;
+        let settingsManager;
+        let pwaManager;
+        let animationManager;
+        let accessibilityManager;
+        let performanceMonitor;
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(async () => {
+                // Hide loading screen with animation
+                const loadingScreen = document.getElementById('loading-screen');
+                const app = document.getElementById('app');
+                
+                if (window.AnimationManager) {
+                    const animManager = new AnimationManager();
+                    await animManager.animate(loadingScreen, 'fade-out', { duration: 'normal' });
+                    loadingScreen.classList.add('hidden');
+                    app.classList.remove('hidden');
+                    await animManager.animate(app, 'fade-in', { duration: 'normal' });
+                } else {
+                    loadingScreen.classList.add('hidden');
+                    app.classList.remove('hidden');
+                }
+                
+                // Initialize performance monitoring first
+                performanceMonitor = new PerformanceMonitor();
+                performanceMonitor.mark('app-init-start');
+                
+                // Initialize animation system
+                animationManager = new AnimationManager();
+                
+                // Initialize accessibility manager
+                accessibilityManager = new AccessibilityManager();
+                
+                // Initialize PWA manager
+                pwaManager = new PWAManager();
+                
+                // Initialize data storage system
+                dataStorage = new DataStorage();
+                await dataStorage.initializeStorage();
+                
+                // Initialize settings manager
+                settingsManager = new SettingsManager(dataStorage);
+                await settingsManager.loadSettings();
+                
+                // Initialize core systems
+                userProgress = new UserProgress(dataStorage);
+                appRouter = new AppRouter();
+                gameUI = new GameUI();
+                
+                // Make them globally available
+                window.performanceMonitor = performanceMonitor;
+                window.animationManager = animationManager;
+                window.accessibilityManager = accessibilityManager;
+                window.pwaManager = pwaManager;
+                window.dataStorage = dataStorage;
+                window.settingsManager = settingsManager;
+                window.userProgress = userProgress;
+                window.appRouter = appRouter;
+                window.gameUI = gameUI;
+                
+                // Connect managers to game UI
+                accessibilityManager.setGameReference(gameUI);
+                
+                // Initialize homepage with user data
+                updateHomePage();
+                
+                // Try to load saved game from storage system
+                const savedGame = await dataStorage.loadGameState();
+                if (savedGame.success && gameUI.engine) {
+                    const result = gameUI.engine.importGameState(savedGame.gameData);
+                    if (result.success) {
+                        gameUI.updateUI();
+                        gameUI.renderGrid();
+                        gameUI.startTimer();
+                        appRouter.navigateTo('/game');
+                    }
+                }
+                
+                // Start auto-save system
+                dataStorage.startAutoSave(gameUI);
+                
+                // Setup achievement notifications
+                setupAchievementSystem();
+                
+                // Setup connection monitoring
+                setupConnectionMonitoring();
+                
+                // Mark app initialization complete
+                performanceMonitor.mark('app-init-complete');
+                performanceMonitor.measure('app-init-duration', 'app-init-start', 'app-init-complete');
+                
+            }, 2000);
+
+            // Set current date
+            const today = new Date();
+            const months = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('current-date').textContent = 
+                `${months[today.getMonth()]} ${today.getDate()}`;
+
+            // Game action buttons
+            document.getElementById('daily-play-btn')?.addEventListener('click', () => {
+                appRouter?.goToGame('daily');
+            });
+
+            document.getElementById('tournament-play-btn')?.addEventListener('click', () => {
+                appRouter?.goToTournament();
+            });
+
+            document.getElementById('new-game-btn')?.addEventListener('click', () => {
+                appRouter?.goToGame('new');
+            });
+
+            // Back button functionality
+            document.getElementById('back-btn')?.addEventListener('click', () => {
+                appRouter?.goBack();
+            });
+
+            // Enhanced navigation using router
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetPage = item.dataset.page;
+                    const routes = {
+                        'homepage': '/',
+                        'calendar-page': '/daily',
+                        'tournament-page': '/tournament',
+                        'profile-page': '/profile'
+                    };
+                    
+                    // Add button press animation
+                    if (animationManager) {
+                        animationManager.animate(item, 'button-press', { duration: 'fast' });
+                    }
+                    
+                    appRouter?.navigateTo(routes[targetPage] || '/');
+                });
+            });
+
+            // Storage event handlers
+            window.addEventListener('autoSaveCompleted', (e) => {
+                console.log('Auto-save completed at', new Date(e.detail.timestamp));
+            });
+            
+            window.addEventListener('autoSaveFailed', (e) => {
+                console.warn('Auto-save failed:', e.detail.error);
+            });
+        });
+
+        // Handle page visibility change (pause game when tab becomes hidden)
+        document.addEventListener('visibilitychange', () => {
+            if (gameUI?.engine && gameUI.engine.timer.isRunning) {
+                if (document.hidden) {
+                    gameUI.engine.pauseTimer();
+                } else {
+                    gameUI.engine.resumeTimer();
+                }
+            }
+        });
+
+        // Additional app functions
+        function updateHomePage() {
+            if (!userProgress) return;
+            
+            // Show skeleton loaders while loading
+            if (animationManager) {
+                const statElements = [
+                    document.getElementById('best-score'),
+                    document.getElementById('win-streak'),
+                    document.getElementById('completion-rate'),
+                    document.getElementById('games-played'),
+                    document.getElementById('tournament-score'),
+                    document.getElementById('achievement-count')
+                ];
+                
+                statElements.forEach(el => {
+                    if (el) animationManager.createSkeletonLoader(el, { height: '1.5rem' });
+                });
+                
+                // Load data after short delay to show skeleton
+                setTimeout(() => {
+                    loadHomePageData();
+                }, 300);
+            } else {
+                loadHomePageData();
+            }
+        }
+        
+        function loadHomePageData() {
+            const stats = userProgress.getDisplayStats();
+            const completionStats = userProgress.getCompletionStats();
+            const tournamentProgress = userProgress.getTournamentProgress();
+            
+            // Update statistics display with animation
+            const statUpdates = [
+                { id: 'best-score', value: stats.bestScore },
+                { id: 'win-streak', value: stats.currentStreak },
+                { id: 'completion-rate', value: stats.completionRate },
+                { id: 'games-played', value: stats.gamesPlayed },
+                { id: 'tournament-score', value: stats.tournamentScore },
+                { id: 'achievement-count', value: stats.achievements },
+                { id: 'current-level', value: stats.tournamentLevel }
+            ];
+            
+            statUpdates.forEach(({ id, value }) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    if (animationManager) {
+                        animationManager.removeSkeletonLoader(element, value);
+                    } else {
+                        element.textContent = value;
+                    }
+                }
+            });
+            
+            // Update daily challenge status
+            const today = new Date().toISOString().split('T')[0];
+            const dailyCompleted = userProgress.stats.dailyChallenges[today]?.completed || false;
+            const dailyStatus = document.getElementById('daily-status');
+            const dailyProgress = document.getElementById('daily-progress');
+            
+            if (dailyCompleted) {
+                dailyStatus.textContent = 'Completed';
+                dailyStatus.classList.add('completed');
+                dailyProgress.style.width = '100%';
+            } else {
+                dailyStatus.textContent = 'Today';
+                dailyProgress.style.width = '0%';
+            }
+            
+            // Update tournament progress
+            const tournamentProgress_el = document.getElementById('tournament-progress');
+            const progressPercentage = Math.round((tournamentProgress.completedLevels.length / 22) * 100);
+            tournamentProgress_el.style.width = `${progressPercentage}%`;
+        }
+
+        function setupAchievementSystem() {
+            // Listen for game completion to check achievements
+            window.addEventListener('gameCompleted', (event) => {
+                const gameResult = event.detail;
+                const newAchievements = userProgress.checkAchievements(gameResult);
+                
+                newAchievements.forEach(achievementId => {
+                    showAchievementNotification(achievementId);
+                });
+                
+                updateHomePage();
+                
+                // Refresh calendar if it exists
+                if (window.calendarUI) {
+                    window.calendarUI.refresh();
+                }
+                
+                // Refresh tournament if it exists
+                if (window.tournamentUI) {
+                    window.tournamentUI.refresh();
+                }
+            });
+        }
+
+        function showAchievementNotification(achievementId) {
+            const achievement = userProgress.getAchievement(achievementId);
+            if (!achievement) return;
+            
+            const notification = document.createElement('div');
+            notification.className = 'achievement-notification';
+            notification.innerHTML = `
+                <div class="achievement-icon">${achievement.icon}</div>
+                <div>
+                    <div style="font-weight: 600;">${achievement.name}</div>
+                    <div style="font-size: 0.875rem; opacity: 0.9;">${achievement.description}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Animate the notification in
+            if (animationManager) {
+                animationManager.animateAchievementUnlock(notification);
+            }
+            
+            // Announce to screen readers
+            if (accessibilityManager) {
+                accessibilityManager.onAchievementUnlocked(achievement);
+            }
+            
+            setTimeout(() => {
+                if (animationManager) {
+                    animationManager.animate(notification, 'fade-out', { duration: 'fast' }).then(() => {
+                        notification.remove();
+                    });
+                } else {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+
+        function setupConnectionMonitoring() {
+            const connectionStatus = document.createElement('div');
+            connectionStatus.className = 'connection-status';
+            connectionStatus.style.display = 'none';
+            document.body.appendChild(connectionStatus);
+            
+            function updateConnectionStatus() {
+                if (navigator.onLine) {
+                    connectionStatus.textContent = 'Back Online';
+                    connectionStatus.className = 'connection-status online';
+                    setTimeout(() => {
+                        connectionStatus.style.display = 'none';
+                    }, 2000);
+                } else {
+                    connectionStatus.textContent = 'Offline Mode';
+                    connectionStatus.className = 'connection-status offline';
+                    connectionStatus.style.display = 'block';
+                }
+            }
+            
+            window.addEventListener('online', updateConnectionStatus);
+            window.addEventListener('offline', updateConnectionStatus);
+            
+            // Check initial status
+            if (!navigator.onLine) {
+                updateConnectionStatus();
+            }
+        }
+
+        // Integrate GameUI with user progress
+        function integrateGameUI() {
+            if (!gameUI || !userProgress) return;
+            
+            // Override game completion handler
+            const originalHandleGameComplete = gameUI.handleGameComplete.bind(gameUI);
+            gameUI.handleGameComplete = function(result) {
+                // Record in user progress
+                const gameResult = {
+                    difficulty: this.engine.gameState.difficulty,
+                    score: result.score,
+                    time: result.time,
+                    mistakes: this.engine.gameState.mistakes,
+                    hintsUsed: this.engine.gameState.hintsUsed,
+                    gameType: this.currentPuzzle?.type || 'regular',
+                    date: this.currentPuzzle?.date
+                };
+                
+                userProgress.recordGameComplete(gameResult);
+                
+                // Dispatch custom event for achievements
+                window.dispatchEvent(new CustomEvent('gameCompleted', { detail: gameResult }));
+                
+                // Call original handler
+                originalHandleGameComplete(result);
+            };
+            
+            // Override game start handler
+            const originalStartNewGame = gameUI.startNewGame.bind(gameUI);
+            gameUI.startNewGame = function(difficulty, puzzleData) {
+                userProgress.recordGameStart(difficulty, puzzleData?.type || 'regular');
+                originalStartNewGame.call(this, difficulty, puzzleData);
+            };
+        }
+
+        // Initialize integration after everything loads
+        setTimeout(() => {
+            integrateGameUI();
+        }, 100);
+    </script>
+</body>
+</html>

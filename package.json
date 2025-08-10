@@ -1,0 +1,225 @@
+{
+  "name": "sudoku-pwa",
+  "version": "1.0.0",
+  "description": "A comprehensive Sudoku Progressive Web App with tournaments, daily challenges, and offline support",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p 3000 -s",
+    "dev": "npx live-server --port=3000 --open=/",
+    "build": "node build/build.js",
+    "build:dev": "node build/build.js --no-minify",
+    "build:analyze": "node build/build.js --source-maps",
+    "test": "npx serve test -p 3001 --open=/test-runner.html",
+    "test:headless": "node test/headless-runner.js",
+    "lint": "npx eslint js/ --ext .js",
+    "lint:fix": "npx eslint js/ --ext .js --fix",
+    "format": "npx prettier --write \"**/*.{js,css,html,json,md}\"",
+    "validate": "npm run lint && npm run test:headless",
+    "deploy:netlify": "npm run build && netlify deploy --prod --dir=dist",
+    "deploy:vercel": "npm run build && vercel --prod",
+    "deploy:firebase": "npm run build && firebase deploy --only hosting",
+    "deploy:surge": "npm run build && surge dist/",
+    "deploy:github-pages": "npm run build && gh-pages -d dist",
+    "docker:build": "docker build -t sudoku-pwa .",
+    "docker:run": "docker run -p 80:80 sudoku-pwa",
+    "docker:dev": "docker-compose up --build",
+    "audit": "npm audit && lighthouse --output json --output html --chrome-flags=\"--headless\" http://localhost:3000",
+    "performance": "node scripts/performance-audit.js",
+    "size-analysis": "node scripts/bundle-analyzer.js",
+    "precommit": "npm run lint && npm run test:headless",
+    "postbuild": "node scripts/post-build-checks.js"
+  },
+  "keywords": [
+    "sudoku",
+    "pwa",
+    "progressive-web-app",
+    "game",
+    "puzzle",
+    "offline",
+    "javascript",
+    "tournament",
+    "daily-challenge"
+  ],
+  "author": "Sudoku PWA Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/sudoku-pwa.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/sudoku-pwa/issues"
+  },
+  "homepage": "https://sudoku-pwa.netlify.app",
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "live-server": "^1.2.2",
+    "serve": "^14.0.0",
+    "lighthouse": "^11.0.0",
+    "gh-pages": "^6.0.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions",
+    "iOS >= 12",
+    "Android >= 6"
+  ],
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "pwa": {
+    "name": "Sudoku Master",
+    "short_name": "Sudoku",
+    "description": "The ultimate Sudoku experience with tournaments and daily challenges",
+    "theme_color": "#2196F3",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "orientation": "portrait"
+  },
+  "build": {
+    "optimization": {
+      "minify": true,
+      "bundle": true,
+      "compression": "gzip",
+      "caching": true
+    },
+    "targets": {
+      "production": {
+        "sourceMaps": false,
+        "minify": true,
+        "bundle": true
+      },
+      "development": {
+        "sourceMaps": true,
+        "minify": false,
+        "bundle": false
+      }
+    }
+  },
+  "deployment": {
+    "netlify": {
+      "build": {
+        "command": "npm run build",
+        "publish": "dist/"
+      },
+      "redirects": [
+        {
+          "from": "/*",
+          "to": "/index.html",
+          "status": 200
+        }
+      ],
+      "headers": [
+        {
+          "for": "/sw.js",
+          "values": {
+            "Cache-Control": "no-cache, no-store, must-revalidate"
+          }
+        },
+        {
+          "for": "/manifest.json",
+          "values": {
+            "Content-Type": "application/manifest+json"
+          }
+        }
+      ]
+    },
+    "vercel": {
+      "builds": [
+        {
+          "src": "build/build.js",
+          "use": "@now/node"
+        }
+      ],
+      "routes": [
+        {
+          "src": "/sw.js",
+          "headers": {
+            "Cache-Control": "no-cache, no-store, must-revalidate"
+          }
+        },
+        {
+          "src": "/(.*)",
+          "dest": "/index.html"
+        }
+      ]
+    },
+    "firebase": {
+      "hosting": {
+        "public": "dist",
+        "ignore": [
+          "firebase.json",
+          "**/.*",
+          "**/node_modules/**"
+        ],
+        "rewrites": [
+          {
+            "source": "**",
+            "destination": "/index.html"
+          }
+        ],
+        "headers": [
+          {
+            "source": "/sw.js",
+            "headers": [
+              {
+                "key": "Cache-Control",
+                "value": "no-cache, no-store, must-revalidate"
+              }
+            ]
+          },
+          {
+            "source": "**/*.@(js|css|png|svg)",
+            "headers": [
+              {
+                "key": "Cache-Control",
+                "value": "public, max-age=31536000, immutable"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "performance": {
+    "budgets": [
+      {
+        "type": "initial",
+        "maximumWarning": "250kb",
+        "maximumError": "400kb"
+      },
+      {
+        "type": "anyComponentStyle",
+        "maximumWarning": "50kb",
+        "maximumError": "100kb"
+      },
+      {
+        "type": "anyScript",
+        "maximumWarning": "150kb",
+        "maximumError": "250kb"
+      }
+    ],
+    "lighthouse": {
+      "performance": 90,
+      "accessibility": 100,
+      "best-practices": 90,
+      "seo": 90,
+      "pwa": 100
+    }
+  },
+  "testing": {
+    "coverage": {
+      "threshold": {
+        "global": {
+          "lines": 80,
+          "functions": 80,
+          "branches": 80,
+          "statements": 80
+        }
+      }
+    }
+  }
+}
