@@ -362,10 +362,10 @@ class PerformanceAuditor {
         if (report.lighthouse.metrics) {
             console.log('\n⏱️ Core Web Vitals:');
             const metrics = report.lighthouse.metrics;
-            console.log(`  FCP: ${Math.round(metrics.firstContentfulPaint)}ms`);
-            console.log(`  LCP: ${Math.round(metrics.largestContentfulPaint)}ms`);
-            console.log(`  CLS: ${metrics.cumulativeLayoutShift.toFixed(3)}`);
-            console.log(`  TBT: ${Math.round(metrics.totalBlockingTime)}ms`);
+            console.log(`  FCP: ${metrics.firstContentfulPaint ? Math.round(metrics.firstContentfulPaint) : 'N/A'}ms`);
+            console.log(`  LCP: ${metrics.largestContentfulPaint ? Math.round(metrics.largestContentfulPaint) : 'N/A'}ms`);
+            console.log(`  CLS: ${metrics.cumulativeLayoutShift ? metrics.cumulativeLayoutShift.toFixed(3) : 'N/A'}`);
+            console.log(`  TBT: ${metrics.totalBlockingTime ? Math.round(metrics.totalBlockingTime) : 'N/A'}ms`);
         }
         
         if (report.custom.bundleSize) {

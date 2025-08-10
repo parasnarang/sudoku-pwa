@@ -129,8 +129,7 @@ jobs:
       run: npm audit --audit-level high
 
   deploy-netlify:
-    if: github.ref == 'refs/heads/main'
-    needs: [build, performance-audit, security-scan]
+    if: github.ref == 'refs/heads/main' && false  # Disabled - no Netlify credentials
     runs-on: ubuntu-latest
     
     steps:
@@ -188,8 +187,7 @@ jobs:
         vercel-args: '--prod'
 
   deploy-firebase:
-    if: github.ref == 'refs/heads/main'
-    needs: [build, performance-audit, security-scan]
+    if: github.ref == 'refs/heads/main' && false  # Disabled - no Firebase credentials
     runs-on: ubuntu-latest
     
     steps:
@@ -212,8 +210,7 @@ jobs:
       run: firebase deploy --only hosting --project ${{ secrets.FIREBASE_PROJECT_ID }}
 
   build-and-push-docker:
-    if: github.ref == 'refs/heads/main'
-    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main' && false  # Disabled - no Docker credentials
     runs-on: ubuntu-latest
     
     steps:
@@ -253,8 +250,7 @@ jobs:
         platforms: linux/amd64,linux/arm64
 
   deploy-docker:
-    if: github.ref == 'refs/heads/main'
-    needs: build-and-push-docker
+    if: github.ref == 'refs/heads/main' && false  # Disabled - no Docker credentials
     runs-on: ubuntu-latest
     
     steps:
@@ -271,8 +267,7 @@ jobs:
           docker system prune -f
 
   notify:
-    if: always()
-    needs: [deploy-netlify, deploy-firebase, deploy-docker]
+    if: always() && false  # Disabled - no deployment services active
     runs-on: ubuntu-latest
     
     steps:
