@@ -432,10 +432,10 @@ class BuildOptimizer {
         const scriptBlocks = [];
         let htmlWithPlaceholders = html.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, (match, scriptContent) => {
             scriptBlocks.push(match);
-            return `<!--SCRIPT_PLACEHOLDER_${scriptBlocks.length - 1}-->`;
+            return `__SCRIPT_PLACEHOLDER_${scriptBlocks.length - 1}__`;
         });
         
-        // Minify HTML (but not script content)
+        // Minify HTML (but not script content) - preserve script placeholders
         htmlWithPlaceholders = htmlWithPlaceholders
             .replace(/\s+/g, ' ')
             .replace(/<!--[\s\S]*?-->/g, '')
@@ -445,7 +445,7 @@ class BuildOptimizer {
         // Restore script blocks without minification
         scriptBlocks.forEach((scriptBlock, index) => {
             htmlWithPlaceholders = htmlWithPlaceholders.replace(
-                `<!--SCRIPT_PLACEHOLDER_${index}-->`, 
+                `__SCRIPT_PLACEHOLDER_${index}__`, 
                 scriptBlock
             );
         });
