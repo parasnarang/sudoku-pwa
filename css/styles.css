@@ -656,6 +656,7 @@ body, html {
 .sudoku-grid {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
+    grid-template-rows: repeat(9, 1fr);
     gap: 1px;
     background-color: var(--sage-green);
     border: 2px solid var(--sage-green);
@@ -676,7 +677,7 @@ body, html {
     cursor: pointer;
     transition: var(--transition);
     position: relative;
-    min-height: 40px;
+    height: 100%;
     user-select: none;
     color: var(--soft-charcoal);
 }
